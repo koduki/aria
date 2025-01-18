@@ -1,0 +1,29 @@
+{
+  "name": "vrm-viewer",
+  "version": "1.0.0",
+  "description": "VRM Viewer using Three.js and Electron",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "start": "electron .",
+    "dev": "concurrently \"npm run watch\" \"electron .\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pixiv/three-vrm": "^1.0.10",
+    "@pixiv/three-vrm-animation": "^3.3.2",
+    "electron": "^28.1.0",
+    "three": "^0.151.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.151.0",
+    "concurrently": "^8.2.2",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  }
+}

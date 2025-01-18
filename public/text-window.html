@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Message</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #c3c7ca; /* 背景色は任意 */
+      font-family: sans-serif;
+    }
+
+    /* 全体を中央寄せするラッパ */
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    /* 表示用ウインドウのスタイル */
+    .display-window {
+      width: 300px;  /* 必要に応じて調整 */
+      padding: 10px;
+      background-color: #ffffff;
+      border: 2px solid #cccccc;
+      border-radius: 10px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .display-window p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap; /* 改行を反映したい場合はpre-wrapなどを使う */
+    }
+
+    /* 入力用テキストボックスとボタンをまとめる枠 */
+    .input-area {
+      display: flex;
+      align-items: center;
+      width: 300px;
+    }
+
+    /* テキスト入力 */
+    .input-area textarea {
+      flex: 1; /* 横幅いっぱいに */
+      resize: none;
+      height: 40px; /* 必要に応じて高さを調整 */
+      border-radius: 5px;
+      border: 1px solid #cccccc;
+      padding: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    /* ボタン部分（例としてアイコンボタンっぽく） */
+    .button-area {
+      display: flex;
+      flex-shrink: 0; /* 押しつぶされ防止 */
+      margin-left: 5px;
+    }
+    .button-area button {
+      background-color: #ffffff;
+      border: 1px solid #cccccc;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      margin-left: 5px; /* ボタン同士の間隔 */
+      cursor: pointer;
+      outline: none;
+      font-size: 16px;
+    }
+    .button-area button:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 上の表示用ウインドウ -->
+    <div class="display-window">
+      <p>やっほー。 <br />何か質問ある？</p>
+    </div>
+
+    <!-- 下のテキストボックス（入力用）-->
+    <div class="input-area">
+      <textarea placeholder="文章を入力…"></textarea>
+      <div class="button-area">
+        <!-- <button title="マイク"><i class="fas fa-microphone"></i></button> -->
+        <button title="投稿"><i class="fas fa-play"></i></button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
