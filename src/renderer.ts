@@ -22,7 +22,7 @@ let startWindowY = 0;
 // シーンの設定
 const scene = new THREE.Scene();
 
-// クリックイベントリスナーを追加
+// イベントリスナーを追加
 document.addEventListener('click', () => {
   if (currentVRM && currentVRM.humanoid) {
     const rightUpperArm = currentVRM.humanoid.getNormalizedBoneNode('rightUpperArm');
@@ -31,7 +31,7 @@ document.addEventListener('click', () => {
     }
   }
 });
-document.addEventListener('dblclick', () => ipcRenderer.send('request-window-info'));
+document.addEventListener('dblclick', () => ipcRenderer.send('open-chat'));
 
 // カメラの設定
 const camera = new THREE.PerspectiveCamera(

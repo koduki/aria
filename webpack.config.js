@@ -44,4 +44,26 @@ const renderer = {
   }
 };
 
-module.exports = [main, renderer];
+const chatWindow = {
+  mode: 'development',
+  target: 'electron-renderer', // target: 'electron-renderer' also works
+  entry: './src/chat-window.ts',
+  output: {
+    path: path.join(__dirname, 'public'),
+    filename: 'chat-window.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+};
+
+module.exports = [main, renderer, chatWindow];

@@ -42,8 +42,10 @@ app.on('window-all-closed', function () {
   }
 });
 
-ipcMain.on('request-window-info', (event) => {
-  console.log("Hello")
+let chatWindow: BrowserWindow | null = null;
+
+ipcMain.on('open-chat', (event) => {
+  console.log("Hello");
   const mainWindow = BrowserWindow.getFocusedWindow();
   if (!mainWindow) {
     return;
@@ -52,7 +54,7 @@ ipcMain.on('request-window-info', (event) => {
   const newWindowX = x - 100;
   const newWindowY = y + 150;
 
-  let textWindow: BrowserWindow | null = new BrowserWindow({
+  chatWindow = new BrowserWindow({
     x: newWindowX,
     y: newWindowY,
     width: 400,
@@ -65,15 +67,23 @@ ipcMain.on('request-window-info', (event) => {
     },
   });
 
-  textWindow.loadFile(path.join(__dirname, '../public/text-window.html'));
+  chatWindow.loadFile(path.join(__dirname, '../public/chat-window.html'));
+  // chatWindow.webContents.openDevTools();
 
   setTimeout(() => {
-    if (textWindow) {
-      textWindow.close();
+    if (chatWindow) {
+      chatWindow.close();
     }
-  }, 10*1000);
+  }, 10 * 1000);
 
-  textWindow.on('closed', () => {
-    textWindow = null;
+  chatWindow.on('closed', () => {
+    chatWindow = null;
   });
+});
+
+ipcMain.on('call-chat', (event, message) => {
+  if (chatWindow && chatWindow.webContents) {
+    let msg = message + "::::";
+    chatWindow.webContents.send('reply-chat', msg);
+  }
 });
