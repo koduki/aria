@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
+import axios from 'axios';
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -74,16 +75,25 @@ ipcMain.on('open-chat', (event) => {
     if (chatWindow) {
       chatWindow.close();
     }
-  }, 10 * 1000);
+  }, 30 * 1000);
 
   chatWindow.on('closed', () => {
     chatWindow = null;
   });
 });
 
-ipcMain.on('call-chat', (event, message) => {
+ipcMain.on('call-chat', async (event, message) => {
   if (chatWindow && chatWindow.webContents) {
-    let msg = message + "::::";
-    chatWindow.webContents.send('reply-chat', msg);
+    const response = await axios.post('http://localhost:4567/api/chat', {
+      "text": message
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const replyText = response.data.response.content.parts[0].text;
+    chatWindow.webContents.send('reply-chat', replyText);
   }
+
 });
