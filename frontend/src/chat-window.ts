@@ -16,4 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
       displayWindow.textContent = message;
     });
   }
+
+  const closeButton = document.getElementById('closeButton');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      window.close();
+    });
+  }
 });

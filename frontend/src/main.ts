@@ -71,11 +71,11 @@ ipcMain.on('open-chat', (event) => {
   chatWindow.loadFile(path.join(__dirname, '../public/chat-window.html'));
   // chatWindow.webContents.openDevTools();
 
-  setTimeout(() => {
-    if (chatWindow) {
-      chatWindow.close();
-    }
-  }, 30 * 1000);
+  // setTimeout(() => {
+  //   if (chatWindow) {
+  //     chatWindow.close();
+  //   }
+  // }, 30 * 1000);
 
   chatWindow.on('closed', () => {
     chatWindow = null;

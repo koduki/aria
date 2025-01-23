@@ -76,7 +76,6 @@ loader.load(
     scene.add(vrm.scene);
     currentVRM = vrm;
 
-    // 3秒後に表情をHappyに変更
     setTimeout(() => {
       if (currentVRM && currentVRM.expressionManager) {
         // currentVRM.expressionManager.setValue('happy', 1);
