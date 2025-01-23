@@ -18,23 +18,22 @@ class History
   def initialize()
     @history = []
   end
-  def add_message(message)
-    @history.push(message)
-  end
-  def get_messages()
+
+  def get()
     @history
   end
-  def store(result)
+
+  def add(result)
     if result
       # ユーザーの入力を保存
       user_message = { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
-      add_message(user_message)
+      @history.push(user_message)
 
       # モデルの応答を保存
       model_message = { role: 'model', parts: [{ text: result[:response]["content"]["parts"][0]["text"] }] }
-      add_message(model_message)
+      @history.push(model_message)
 
-      puts "Session history updated: #{get_messages.inspect}"
+      puts "Session history updated: #{@history.inspect}"
     end
   end
 end
