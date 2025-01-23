@@ -14,31 +14,40 @@ client = Gemini.new(
   options: { model: 'gemini-2.0-flash-exp', server_sent_events: true }
 )
 
-# インメモリで履歴を管理
-$history = []
+class History
+  def initialize()
+    @history = []
+  end
+  def add_message(message)
+    @history.push(message)
+  end
+  def get_messages()
+    @history
+  end
+  def store(result)
+    if result
+      # ユーザーの入力を保存
+      user_message = { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
+      add_message(user_message)
 
-def store(result)
-  if result
-    # ユーザーの入力を保存
-    user_message = { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
-    $history << user_message
+      # モデルの応答を保存
+      model_message = { role: 'model', parts: [{ text: result[:response]["content"]["parts"][0]["text"] }] }
+      add_message(model_message)
 
-    # モデルの応答を保存
-    model_message = { role: 'model', parts: [{ text: result[:response]["content"]["parts"][0]["text"] }] }
-    $history << model_message
-
-    puts "Session history updated: #{$history.inspect}"
+      puts "Session history updated: #{get_messages.inspect}"
+    end
   end
 end
+
+# グローバル変数として History クラスのインスタンスを保持
+$history = History.new
 
 post '/api/chat' do
   content_type :json
   request_body = JSON.parse(request.body.read)
   text = request_body['text']
 
-  puts "Current session history: #{$history.inspect}"
   result = client.chat(text, $history)
-  store(result)
 
   result.to_json
 end
