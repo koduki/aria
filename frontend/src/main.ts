@@ -46,7 +46,6 @@ app.on('window-all-closed', function () {
 let chatWindow: BrowserWindow | null = null;
 
 ipcMain.on('open-chat', (event) => {
-  console.log("Hello");
   const mainWindow = BrowserWindow.getFocusedWindow();
   if (!mainWindow) {
     return;
