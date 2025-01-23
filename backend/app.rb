@@ -6,7 +6,7 @@ require './gemini'
 api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
 
 # クライアントオブジェクトを作成
-client = Gemini.new(
+client = Gemini::Gemini.new(
   credentials: {
     service: 'generative-language-api',
     api_key: api_key
@@ -14,32 +14,8 @@ client = Gemini.new(
   options: { model: 'gemini-2.0-flash-exp', server_sent_events: true }
 )
 
-class History
-  def initialize()
-    @history = []
-  end
-
-  def get()
-    @history
-  end
-
-  def add(result)
-    if result
-      # ユーザーの入力を保存
-      user_message = { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
-      @history.push(user_message)
-
-      # モデルの応答を保存
-      model_message = { role: 'model', parts: [{ text: result[:response]["content"]["parts"][0]["text"] }] }
-      @history.push(model_message)
-
-      puts "Session history updated: #{@history.inspect}"
-    end
-  end
-end
-
 # グローバル変数として History クラスのインスタンスを保持
-$history = History.new
+$history = Gemini::History.new
 
 post '/api/chat' do
   content_type :json
