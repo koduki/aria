@@ -34,12 +34,18 @@ class Gemini
 
   def chat(text, history)
     puts "XXXXXXXXXXXXXX"
-
     p text
     p history
     puts "XXXXXXXXXXXXXX"
+
+    # 履歴が空でない場合は、最後のモデルの応答を取得
+    contents = history.empty? ? [] : history
+
+    # 新しいユーザーメッセージを追加
+    contents = contents + [{ role: 'user', parts: [{ text: text }] }]
+
     generate_content({
-      contents: history  + [{ role: 'user', parts: [{ text: text }] }]
+      contents: contents
     })
   end
 end
