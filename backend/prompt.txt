@@ -1,3 +1,32 @@
+irb(main):034> json_data[0]["contents"][0]["contents"][0]
+
+summary = json_data[0]["contents"][0]["contents"][0]["body"]
+son_data ='json_data = JSON.parse(File.read('contents.json'));1
+
+client = Gemini::Gemini.new(
+  credentials: {
+    service: 'generative-language-api',
+    api_key: api_key
+  },
+  options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction: <<~INSTRUCTION
+    Create the report with markdown in Japanese. It should be follow below proceduer and policy
+    "1. only use user request information.",
+    "2. Extract key information from the search results for each theme, summarizing it concisely.",
+    "3. Synthesize the summaries from each theme to create a coherent report.",
+    "4. The report should first introduce the basic concepts of Docker, then the basic concepts of Podman. It will then detail the key differences between them regarding architecture, usage, security, etc. Finally, it will discuss compatibility and migration between the two.",
+    "5. If relevant information is missing after the initial search, reformulate the search keywords for that theme and try again."
+ INSTRUCTION
+  }
+)
+r = client.generate_content({
+    contents: [{ role: 'user', parts: [{ text: File.read('contents.json') }] }]
+})
+puts r[:response]["content"]["parts"][0]["text"]
+
+
+
+
+
 ウェブサイトをリサーチ
 AIエージェントとMCPについて教えてください。従来のFunctional Callingとは違うの？
 (1) AIエージェントとMCPの定義をそれぞれ調べてください。
