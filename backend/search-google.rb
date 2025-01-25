@@ -13,12 +13,13 @@ def search_google(search_word)
     driver.get(url)
 
     results = []
-    driver.find_elements(css: 'div.results--main div.nrn-react-div a.nrn-ext-link').each do |link_element|
-      url = link_element.attribute('href')
-      p url
-      title_element = link_element.find_element(css: 'span')
-      p title_element
-      title = title_element ? title_element.text : nil
+    driver.find_elements(css: 'ol.react-results--main li').each do |li_element|
+      title_element = li_element.find_element(css: 'h3')
+      url_element = li_element.find_element(css: 'a')
+      title = title_element.text
+      url = url_element.attribute('href')
+      puts "タイトル: #{title}"
+      puts "URL: #{url}"
       results << { url: url, title: title }
     end
     driver.quit
