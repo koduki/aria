@@ -3,10 +3,10 @@ require 'json'
 require 'cgi'
 
 def search_google(search_word)
-  p search_word
-
+  puts "search_google 関数開始: search_word = #{search_word}"
   encoded_search_word = CGI.escape(search_word)
   url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
+  puts "DuckDuckGo URL: #{url}"
 
   begin
     wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
@@ -16,6 +16,7 @@ def search_google(search_word)
 
     results = []
     begin
+      puts "'ol.react-results--main'要素の検索を開始"
       wait.until { driver.find_element(css: 'ol.react-results--main') }
       puts "'ol.react-results--main'要素が見つかりました"
     rescue Selenium::WebDriver::Error::TimeoutError => e
@@ -25,23 +26,23 @@ def search_google(search_word)
       return []
     end
 
-    driver.find_elements(css: 'ol.react-results--main li').each do |li_element|
-        puts "item: #{li_element.attribute('innerHTML')}"
-      title_element = li_element.find_element(css: 'span')
-      url_element = li_element.find_element(css: 'a')
+    driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
+    #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
+      title_element = li_element.find_element(css: 'h2 a span')
+      url_element = li_element.find_element(css: 'h2 a')
       title = title_element.text
       url = url_element.attribute('href')
-      puts "タイトル: #{title}"
-      puts "URL: #{url}"
+ 
       results << { url: url, title: title }
     end
     driver.quit
+
     return results
   rescue Selenium::WebDriver::Error::WebDriverError => e
-    puts "Error fetching DuckDuckGo with Selenium: #{e.message}"
+    puts "Selenium WebDriver エラー: #{e.message}"
     return []
   rescue => e
-    puts "An unexpected error occurred: #{e.message}"
+    puts "予期しないエラーが発生しました: #{e.message}"
     return []
   end
 end
