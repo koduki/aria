@@ -49,7 +49,9 @@ end
 
 def extract_content(url)
   begin
-    driver = Selenium::WebDriver.for :edge
+    options = Selenium::WebDriver::Edge::Options.new
+    options.add_argument('--headless')
+    driver = Selenium::WebDriver.for :edge, options: options
     driver.get(url)
 
     title = driver.title
@@ -73,12 +75,13 @@ puts "=========="
 puts
 puts
 
-results = {}
+results = []
 json_data["search-themes"].each do |theme_data|
   theme_name = theme_data["theme"]
   puts "テーマ名:"
   p theme_name
-  results[theme_name] = {}
+  # results[theme_name] = {}
+  item_words = []
   theme_data["search-words"].each do |search_word|
     puts "  検索ワード:"
     p search_word
@@ -87,23 +90,30 @@ json_data["search-themes"].each do |theme_data|
     p search_results
 
     puts "    コンテンツ抽出開始"
-    results[theme_name][search_word] = []
 
+    item_contents = []
     search_results.take(3).each do |result|
       if result[:url]
         puts "      URL:"
         p result[:url]
         content = extract_content(result[:url])
         puts "        コンテンツ抽出結果:"
-        p content
-        results[theme_name][search_word] << {
+        item_contents << {
           url: result[:url],
           title: content[:title],
           body: content[:body]
         }
       end
     end
+    item_words << {
+      words: search_word,
+      contents: item_contents
+    }
   end
+  results << {
+      theme: theme_name,
+      contents: item_words
+  }
 end
 
 puts "=========="

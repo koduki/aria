@@ -1,17 +1,49 @@
 {
     "search-themes": [
-        {
-            "theme": "Basic Concepts of Docker",
-            "search-words": [
-                "Docker architecture"
-            ]
-        }
+      {
+        "theme": "Basic Concepts of Docker",
+        "search-words": [
+          "Docker overview",
+          "What is Docker?",
+          "Docker containerization",
+          "Docker architecture"
+        ]
+      },
+      {
+        "theme": "Basic Concepts of Podman",
+        "search-words": [
+          "Podman overview",
+          "What is Podman?",
+          "Podman containerization",
+          "Podman architecture"
+        ]
+      },
+      {
+        "theme": "Key Differences between Docker and Podman (Architecture and Usage)",
+        "search-words": [
+          "Docker vs Podman architecture",
+          "Docker vs Podman rootless",
+          "Docker vs Podman daemon",
+          "Docker vs Podman CLI",
+          "Docker vs Podman security"
+        ]
+      },
+      {
+        "theme": "Compatibility and Migration between Docker and Podman",
+        "search-words": [
+          "Migrate from Docker to Podman",
+          "Podman Docker compatibility",
+          "Podman Dockerfile support",
+          "Docker Compose vs Podman Compose"
+        ]
+      }
     ],
     "report-creation-procedures": [
-        "1. Search the web using the keywords for each theme.",
-        "2. Extract key information from the search results for each theme, summarizing it concisely.",
-        "3. Synthesize the summaries from each theme to create a coherent report.",
-        "4. The report should first introduce the basic concepts of Docker, then the basic concepts of Podman. It will then detail the key differences between them regarding architecture, usage, security, etc. Finally, it will discuss compatibility and migration between the two.",
-        "5. If relevant information is missing after the initial search, reformulate the search keywords for that theme and try again."
-    ]
-}
+      "1. Search the web using the keywords for each theme.",
+      "2. Extract key information from the search results for each theme, summarizing it concisely.",
+      "3. Synthesize the summaries from each theme to create a coherent report.",
+      "4. The report should first introduce the basic concepts of Docker, then the basic concepts of Podman. It will then detail the key differences between them regarding architecture, usage, security, etc. Finally, it will discuss compatibility and migration between the two.",
+      "5. If relevant information is missing after the initial search, reformulate the search keywords for that theme and try again."
+    ],
+    "explanation-to-user": "This report is structured to first establish the foundational understanding of both Docker and Podman individually. It then dives into a detailed comparison of their key differences, covering aspects like architecture and usage. Finally, it addresses the practical considerations of compatibility and migration, providing a complete answer to your question."
+  }
