@@ -9,11 +9,14 @@ def search_google(search_word)
   url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
 
   begin
+    wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
     driver = Selenium::WebDriver.for :edge
     driver.get(url)
 
     results = []
+    wait.until { driver.find_element(css: 'ol.react-results--main') }
     driver.find_elements(css: 'ol.react-results--main li').each do |li_element|
+        puts "item: #{li_element}"
       title_element = li_element.find_element(css: 'h3')
       url_element = li_element.find_element(css: 'a')
       title = title_element.text
