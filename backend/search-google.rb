@@ -84,22 +84,22 @@ json_data["search-themes"].each do |theme_data|
     search_results = search_google(search_word)
     puts "    検索結果:"
     p search_results
-    results[theme_name][search_word] = []
+    # results[theme_name][search_word] = []
 
-    search_results.each do |result|
-      if result[:url]
-        puts "      URL:"
-        p result[:url]
-        content = extract_content(result[:url])
-        puts "        コンテンツ抽出結果:"
-        p content
-        results[theme_name][search_word] << {
-          url: result[:url],
-          title: content[:title],
-          body: content[:body]
-        }
-      end
-    end
+    # search_results.each do |result|
+    #   if result[:url]
+    #     puts "      URL:"
+    #     p result[:url]
+    #     content = extract_content(result[:url])
+    #     puts "        コンテンツ抽出結果:"
+    #     p content
+    #     results[theme_name][search_word] << {
+    #       url: result[:url],
+    #       title: content[:title],
+    #       body: content[:body]
+    #     }
+    #   end
+    # end
   end
 end
 
