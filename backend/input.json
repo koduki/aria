@@ -3,9 +3,6 @@
         {
             "theme": "Basic Concepts of Docker",
             "search-words": [
-                "Docker overview",
-                "What is Docker?",
-                "Docker containerization",
                 "Docker architecture"
             ]
         }

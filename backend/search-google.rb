@@ -1,6 +1,4 @@
-require 'nokogiri'
-require 'open-uri'
-require 'uri'
+require 'selenium-webdriver'
 require 'json'
 require 'cgi'
 
@@ -11,27 +9,22 @@ def search_google(search_word)
   url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
 
   begin
-    doc = Nokogiri::HTML(URI.open(url, 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'))
-    p doc
-    results = []
+    driver = Selenium::WebDriver.for :edge
+    driver.get(url)
 
-    doc.css('div.results--main div.nrn-react-div a.nrn-ext-link').each do |link|
-      url = link['href']
+    results = []
+    driver.find_elements(css: 'div.results--main div.nrn-react-div a.nrn-ext-link').each do |link_element|
+      url = link_element.attribute('href')
       p url
-      title_element = link.at_css('span')
+      title_element = link_element.find_element(css: 'span')
       p title_element
       title = title_element ? title_element.text : nil
       results << { url: url, title: title }
     end
+    driver.quit
     return results
-  rescue OpenURI::HTTPError => e
-    puts "Error fetching DuckDuckGo: #{e.message}"
-    return []
-  rescue SocketError => e
-    puts "Error fetching DuckDuckGo: #{e.message}"
-    return []
-  rescue URI::InvalidURIError => e
-    puts "Invalid URL: #{url}: #{e.message}"
+  rescue Selenium::WebDriver::Error::WebDriverError => e
+    puts "Error fetching DuckDuckGo with Selenium: #{e.message}"
     return []
   rescue => e
     puts "An unexpected error occurred: #{e.message}"
@@ -41,18 +34,16 @@ end
 
 def extract_content(url)
   begin
-    doc = Nokogiri::HTML(URI.open(url, 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'))
-    title = doc.title
-    body = doc.css('body').text.gsub(/\s+/, ' ').strip
+    driver = Selenium::WebDriver.for :edge
+    driver.get(url)
+
+    title = driver.title
+    body = driver.find_element(tag_name: 'body').text.gsub(/\s+/, ' ').strip
+
+    driver.quit
     return { title: title, body: body }
-  rescue OpenURI::HTTPError => e
-    puts "Error fetching #{url}: #{e.message}"
-    return { title: nil, body: nil }
-  rescue SocketError => e
-    puts "Error fetching #{url}: #{e.message}"
-    return { title: nil, body: nil }
-  rescue URI::InvalidURIError => e
-    puts "Invalid URL: #{url}: #{e.message}"
+  rescue Selenium::WebDriver::Error::WebDriverError => e
+    puts "Error fetching #{url} with Selenium: #{e.message}"
     return { title: nil, body: nil }
   rescue => e
     puts "An unexpected error occurred while fetching #{url}: #{e.message}"

@@ -6,3 +6,4 @@ gem 'rackup'
 gem 'puma'
 
 gem 'nokogiri'
+gem 'selenium-webdriver'
