@@ -8,27 +8,27 @@ def search_google(search_word)
   p search_word
 
   encoded_search_word = CGI.escape(search_word)
-  url = "https://www.google.co.jp/search?q=#{encoded_search_word}&num=5"
+  url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
 
   begin
     doc = Nokogiri::HTML(URI.open(url, 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'))
     p doc
     results = []
 
-    doc.css('.yuRUbf > a').each do |link|
+    doc.css('div.results--main div.nrn-react-div a.nrn-ext-link').each do |link|
       url = link['href']
       p url
-      title_element = link.at_css('h3')
+      title_element = link.at_css('span')
       p title_element
       title = title_element ? title_element.text : nil
       results << { url: url, title: title }
     end
     return results
   rescue OpenURI::HTTPError => e
-    puts "Error fetching Google: #{e.message}"
+    puts "Error fetching DuckDuckGo: #{e.message}"
     return []
   rescue SocketError => e
-    puts "Error fetching Google: #{e.message}"
+    puts "Error fetching DuckDuckGo: #{e.message}"
     return []
   rescue URI::InvalidURIError => e
     puts "Invalid URL: #{url}: #{e.message}"
