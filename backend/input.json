@@ -1,0 +1,20 @@
+{
+    "search-themes": [
+        {
+            "theme": "Basic Concepts of Docker",
+            "search-words": [
+                "Docker overview",
+                "What is Docker?",
+                "Docker containerization",
+                "Docker architecture"
+            ]
+        }
+    ],
+    "report-creation-procedures": [
+        "1. Search the web using the keywords for each theme.",
+        "2. Extract key information from the search results for each theme, summarizing it concisely.",
+        "3. Synthesize the summaries from each theme to create a coherent report.",
+        "4. The report should first introduce the basic concepts of Docker, then the basic concepts of Podman. It will then detail the key differences between them regarding architecture, usage, security, etc. Finally, it will discuss compatibility and migration between the two.",
+        "5. If relevant information is missing after the initial search, reformulate the search keywords for that theme and try again."
+    ]
+}
