@@ -11,9 +11,9 @@ module Agent
       @api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
     end
 
-    def invoke
+    def invoke(user_request)
       puts "==== Creating strategy"
-      strategy = make_strategy()
+      strategy = make_strategy(user_request)
       puts "==== Seaching contents"
       contents = search(strategy["search-themes"])
       puts "==== Generate report"
@@ -24,8 +24,20 @@ module Agent
     def make_strategy(user_request)
       prompt_path = "prompts/deep_research_strategy.json.erb"
       prompt = ERB.new(File.read(prompt_path)).result_with_hash({ user_request: user_request })
-      puts prompt
-      # JSON.parse(erb_str)
+      
+      client = Gemini::Gemini.new(
+        credentials: {
+          service: 'generative-language-api',
+          api_key: @api_key
+        },
+        options: { model: 'gemini-2.0-flash-thinking-exp'}
+      )
+      r = client.generate_content({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      })
+
+      puts r[:response]["content"]["parts"][0]["text"]
+      JSON.parse(r[:response]["content"]["parts"][0]["text"])
     end
 
     def _extract_content(url)
@@ -91,7 +103,7 @@ def generate_report(contents, prompt)
       service: 'generative-language-api',
       api_key: @api_key
     },
-    options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction:prompt}
+    options: { model: 'gemini-2.0-flash-exp', system_instruction:prompt}
   )
   r = client.generate_content({
       contents: [{ role: 'user', parts: [{ text: contents }] }]
@@ -100,4 +112,4 @@ def generate_report(contents, prompt)
   puts r[:response]["content"]["parts"][0]["text"]
 end
 
-Agent::DeepSearcher.new.make_strategy
+Agent::DeepSearcher.new.invoke "Amazon DSQL、Google Cloud Spanner、TiDBを比較して。比較表も欲しい。"
