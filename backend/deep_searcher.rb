@@ -30,13 +30,12 @@ module Agent
           service: 'generative-language-api',
           api_key: @api_key
         },
-        options: { model: 'gemini-2.0-flash-thinking-exp'}
+        options: { model: 'gemini-2.0-flash-exp'}
       )
       r = client.generate_content({
           contents: [{ role: 'user', parts: [{ text: prompt }] }]
       })
 
-      puts r[:response]["content"]["parts"][0]["text"]
       JSON.parse(r[:response]["content"]["parts"][0]["text"])
     end
 

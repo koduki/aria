@@ -44,10 +44,14 @@ module Gemini
           }
         }
       }
-      
-      # ペイロードの先頭にsystem_instructionを追加
-      payload = system_instruction.merge(payload)
 
+      generationConfig ={
+"generationConfig": { "response_mime_type": "application/json" }
+      
+      }
+      # ペイロードの先頭にsystem_instructionを追加
+      payload = system_instruction.merge(generationConfig).merge(payload)
+      # puts payload
       uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{@model}:generateContent?key=#{@api_key}")
       request = Net::HTTP::Post.new(uri)
       request['Content-Type'] = 'application/json'
@@ -57,6 +61,7 @@ module Gemini
         http.request(request)
       end
 
+      p response
       response_body = JSON.parse(response.body)
       if response_body['candidates'] && !response_body['candidates'].empty?
             {
