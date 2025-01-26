@@ -7,13 +7,15 @@ class SearchWeb
     @input_file = "input.json"
   end
 
-  def open(url)
+  def open(url, options = {})
     begin
       wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
 
-      options = Selenium::WebDriver::Edge::Options.new
-      options.add_argument('--headless')
-      driver = Selenium::WebDriver.for :edge, options: options
+      selenium_options = Selenium::WebDriver::Edge::Options.new
+      if options[:headless] == true
+        selenium_options.add_argument('--headless')
+      end
+      driver = Selenium::WebDriver.for :edge, options: selenium_options
       driver.get(url)
 
       begin
@@ -31,7 +33,7 @@ class SearchWeb
 
       result = yield driver if block_given? # ブロックが与えられた場合のみ実行
       driver.quit
-      
+
       result
     rescue Selenium::WebDriver::Error::WebDriverError => e
       puts "Selenium WebDriver エラー: #{e.message}"
@@ -68,7 +70,7 @@ class SearchWeb
     p search_word
     encoded_search_word = CGI.escape(search_word)
     url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
-    search_results = open(url) do |driver|
+    search_results = open(url, headless: true) do |driver| # headless অপশন যোগ করুন
       results = []
       driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
       #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
@@ -83,7 +85,7 @@ class SearchWeb
       end
       results
     end
-    search_results 
+    search_results
   end
 
   def deep_search
