@@ -2,17 +2,13 @@ require 'selenium-webdriver'
 require 'json'
 require 'cgi'
 
-class SearchWeb
-  def initialize()
-    @input_file = "input.json"
-  end
-
+class WebClient
   def open(url, options = {})
     begin
       wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
 
       selenium_options = Selenium::WebDriver::Edge::Options.new
-      headless = oｆheadless]
+      headless = options[:headless]
       if headless.nil? || headless == true
         selenium_options.add_argument('--headless')
       end
@@ -31,7 +27,7 @@ class SearchWeb
         end
       end
 
-      puts "oepn: #{url}"
+      puts "open: #{url}"
       result = yield driver if block_given? # ブロックが与えられた場合のみ実行
       driver.quit
 
@@ -43,6 +39,13 @@ class SearchWeb
       puts "予期しないエラーが発生しました: #{e.message}"
       return [] # 予期しないエラー発生時も空の配列を返す
     end
+  end
+end
+
+class SearchWeb
+  def initialize()
+    @input_file = "input.json"
+    @web_client = WebClient.new
   end
 
   def extract_content(url)
@@ -67,11 +70,11 @@ class SearchWeb
   end
   
   def search(search_word)
-    puts "  検索ワード:"
-    p search_word
+    puts "検索ワード:#{search_word}"
+
     encoded_search_word = CGI.escape(search_word)
     url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
-    search_results = open(url, wait_element: 'ol.react-results--main') do |driver|
+    search_results = @web_client.open(url, wait_element: 'ol.react-results--main', headless: true) do |driver|
       results = []
       driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
       #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
