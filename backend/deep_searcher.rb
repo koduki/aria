@@ -1,4 +1,5 @@
 require 'json'
+require 'erb'
 
 require './gemini'
 require './web_search'
@@ -20,8 +21,11 @@ module Agent
       report
     end
 
-    def make_strategy
-      JSON.parse(File.read("input.json"))
+    def make_strategy(user_request)
+      prompt_path = "prompts/deep_research_strategy.json.erb"
+      prompt = ERB.new(File.read(prompt_path)).result_with_hash({ user_request: user_request })
+      puts prompt
+      # JSON.parse(erb_str)
     end
 
     def _extract_content(url)
@@ -96,4 +100,4 @@ def generate_report(contents, prompt)
   puts r[:response]["content"]["parts"][0]["text"]
 end
 
-Agent::DeepSearcher.new.invoke
+Agent::DeepSearcher.new.make_strategy
