@@ -2,11 +2,10 @@ require 'selenium-webdriver'
 require 'json'
 require 'cgi'
 
-require './web-client'
+require './web_client'
 
-class SearchWeb
+class WebSearch
   def initialize()
-    @input_file = "input.json"
   end
   
   def search(search_word)
