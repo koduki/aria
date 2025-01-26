@@ -1,9 +1,9 @@
 require 'json'
 require 'erb'
 
-require './gemini'
-require './web_search'
-require './web_client'
+require_relative './gemini'
+require_relative './web_search'
+require_relative './web_client'
 
 module Agent
   class DeepSearcher
@@ -22,9 +22,8 @@ module Agent
     end
 
     def make_strategy(user_request)
-      prompt_path = "prompts/deep_research_strategy.json.erb"
+      prompt_path = File.join(__dir__, "../prompts/deep_research_strategy.json.erb")
       prompt = ERB.new(File.read(prompt_path)).result_with_hash({ user_request: user_request })
-      
       client = Gemini::Gemini.new(
         credentials: {
           service: 'generative-language-api',

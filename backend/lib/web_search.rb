@@ -2,7 +2,7 @@ require 'selenium-webdriver'
 require 'json'
 require 'cgi'
 
-require './web_client'
+require_relative './web_client'
 
 class WebSearch
   def initialize()

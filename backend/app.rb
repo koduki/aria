@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'json'
-require './gemini'
+require_relative './lib/gemini'
 
 # API keyの読み込み
 api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
