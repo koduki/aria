@@ -7,48 +7,38 @@ class SearchWeb
     @input_file = "input.json"
   end
 
-  def search_google(search_word)
-    puts "search_google 関数開始: search_word = #{search_word}"
-    encoded_search_word = CGI.escape(search_word)
-    url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
-    puts "DuckDuckGo URL: #{url}"
-
+  def open(url)
     begin
       wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
-      driver = Selenium::WebDriver.for :edge
-      driver.get(url)
-      puts "DuckDuckGoのページにアクセスしました: #{url}"
 
-      results = []
+      options = Selenium::WebDriver::Edge::Options.new
+      options.add_argument('--headless')
+      driver = Selenium::WebDriver.for :edge, options: options
+      driver.get(url)
+
       begin
         puts "'ol.react-results--main'要素の検索を開始"
+        wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
         wait.until { driver.find_element(css: 'ol.react-results--main') }
         puts "'ol.react-results--main'要素が見つかりました"
       rescue Selenium::WebDriver::Error::TimeoutError => e
         puts "タイムアウトエラー: 'ol.react-results--main'要素が見つかりませんでした"
         puts "エラー詳細: #{e.message}"
-        driver.quit
         return []
       end
 
-      driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
-      #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
-        title_element = li_element.find_element(css: 'h2 a span')
-        url_element = li_element.find_element(css: 'h2 a')
-        title = title_element.text
-        url = url_element.attribute('href')
-   
-        results << { url: url, title: title }
-      end
-      driver.quit
+      puts "oepn: #{url}"
 
-      return results
+      result = yield driver if block_given? # ブロックが与えられた場合のみ実行
+      driver.quit
+      
+      result
     rescue Selenium::WebDriver::Error::WebDriverError => e
       puts "Selenium WebDriver エラー: #{e.message}"
-      return []
+      return [] # エラー発生時は空の配列を返す
     rescue => e
       puts "予期しないエラーが発生しました: #{e.message}"
-      return []
+      return [] # 予期しないエラー発生時も空の配列を返す
     end
   end
 
@@ -72,8 +62,31 @@ class SearchWeb
       return { title: nil, body: nil }
     end
   end
+  
+  def search(search_word)
+    puts "  検索ワード:"
+    p search_word
+    encoded_search_word = CGI.escape(search_word)
+    url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
+    search_results = open(url) do |driver|
+      results = []
+      driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
+      #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
+        title_element = li_element.find_element(css: 'h2 a span')
+        url_element = li_element.find_element(css: 'h2 a')
+        title = title_element.text
+        url = url_element.attribute('href')
+  
+        p title
+        p url
+        results << { url: url, title: title }
+      end
+      results
+    end
+    search_results 
+  end
 
-  def search
+  def deep_search
     json_data = JSON.parse(File.read(@input_file))
     puts "input.jsonの内容:"
     p json_data
@@ -89,9 +102,7 @@ class SearchWeb
       # results[theme_name] = {}
       item_words = []
       theme_data["search-words"].each do |search_word|
-        puts "  検索ワード:"
-        p search_word
-        search_results = search_google(search_word)
+        
         # puts "    検索結果:"
         # p search_results
 
