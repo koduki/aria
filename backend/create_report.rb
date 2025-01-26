@@ -1,34 +1,96 @@
 require 'json'
 require './gemini'
 require './search-web'
+require './web-client'
 
-api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
+class DeepSearcher
+  def initialize
+    @api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
+  end
 
-r = SearchWeb.new.search
+  def invoke
+    puts "==== Creating strategy"
+    strategy = make_strategy()
+    puts "==== Seaching contents"
+    contents = search(strategy["search-themes"])
+    puts "==== Generate report"
+    report = generate_report(contents, strategy["report-creation-prompt"])
+    report
+  end
 
-client = Gemini::Gemini.new(
-  credentials: {
-    service: 'generative-language-api',
-    api_key: api_key
-  },
-  options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction: <<~INSTRUCTION
-    **Please create a report in Japanese using Markdown format, following the steps and policies outlined below. Use only the information provided by the user as the sole source (grounding), and avoid careless speculation or supplementation that could lead to hallucinations.**
+  def make_strategy
+    JSON.parse(File.read("input.json"))
+  end
 
-    1. **Use only the information given by the user.** If additional information is needed or there are unclear points in the provided data, do not resort to speculation or external sources.  
-    2. **Extract key information from the search results for each theme and summarize it concisely.**  
-    3. **Integrate the summaries of each theme to create a coherent report.**  
-    4. **Structure of the report**  
-    - First, introduce the basic concepts of Docker.  
-    - Next, introduce the basic concepts of Podman.  
-    - Then, detail the main differences between Docker and Podman in terms of architecture, usage, security, etc.  
-    - Finally, discuss their compatibility and migration.  
+  def _extract_content(url)
+    begin
+      content_data = WebClient.new.open(url, headless: true) do |driver|
+        title = driver.title
+        body = driver.find_element(tag_name: 'body').text.gsub(/\s+/, ' ').strip
+        { title: title, body: body }
+      end
+      return content_data
+    rescue => e
+      puts "An unexpected error occurred while fetching #{url}: #{e.message}"
+      return { title: nil, body: nil }
+    end
+  end
 
-    **Please adhere strictly to these rules when creating the report.**
- INSTRUCTION
-  }
-)
-r = client.generate_content({
-    contents: [{ role: 'user', parts: [{ text: r }] }]
-})
-puts "============= Report"
-puts r[:response]["content"]["parts"][0]["text"]
+  def search(search_themes)
+    results = []
+    search_themes.each do |theme_data|
+      theme_name = theme_data["theme"]
+      puts "テーマ名:#{theme_name}, #{(results.size + 1)}/#{search_themes.size}"
+
+      item_words = []
+      theme_data["search-words"].each do |search_word|
+        puts "Search Words: #{ (item_words.size + 1)}/#{theme_data["search-words"].size}"
+        search_results = SearchWeb.new.search(search_word)
+
+        item_contents = []
+        search_results.take(3).each do |result|
+          puts "Extract Contents START: #{ (item_contents.size + 1)}/3}"
+          if result[:url]
+            start_time = Time.now
+            content = _extract_content(result[:url])
+            end_time = Time.now
+
+            item_contents << {
+              url: result[:url],
+              title: content[:title],
+              body: content[:body]
+            }
+          end
+          puts "Extract Contents END: #{end_time - start_time}秒"
+        end
+        item_words << {
+          words: search_word,
+          contents: item_contents
+        }
+      end
+      results << {
+          theme: theme_name,
+          contents: item_words
+      }
+    end
+
+    JSON.pretty_generate(results)
+  end
+end
+
+def generate_report(contents, prompt)
+  client = Gemini::Gemini.new(
+    credentials: {
+      service: 'generative-language-api',
+      api_key: @api_key
+    },
+    options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction:prompt}
+  )
+  r = client.generate_content({
+      contents: [{ role: 'user', parts: [{ text: contents }] }]
+  })
+  puts "============= Report"
+  puts r[:response]["content"]["parts"][0]["text"]
+end
+
+DeepSearcher.new.invoke
