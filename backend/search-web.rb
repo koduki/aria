@@ -8,6 +8,8 @@ class WebClient
       wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
 
       selenium_options = Selenium::WebDriver::Edge::Options.new
+      selenium_options.add_argument('--log-level=3') # 0: INFO, 1: WARNING, 2: LOG_ERROR, 3: LOG_FATAL
+
       headless = options[:headless]
       if headless.nil? || headless == true
         selenium_options.add_argument('--headless')
@@ -17,9 +19,7 @@ class WebClient
 
       if options[:wait_element]
         begin
-          puts "'#{options[:wait_element]}'要素の検索開始"
           wait.until { driver.find_element(css: options[:wait_element]) }
-          puts "'#{options[:wait_element]}'要素の検索成功"
         rescue Selenium::WebDriver::Error::TimeoutError => e
           puts "タイムアウトエラー: '#{options[:wait_element]}'要素が見つかりませんでした"
           puts "エラー詳細: #{e.message}"
@@ -27,7 +27,7 @@ class WebClient
         end
       end
 
-      puts "open: #{url}"
+      # puts "open: #{url}"
       result = yield driver if block_given? # ブロックが与えられた場合のみ実行
       driver.quit
 
@@ -45,24 +45,16 @@ end
 class SearchWeb
   def initialize()
     @input_file = "input.json"
-    @web_client = WebClient.new
   end
 
-  def extract_content(url)
+  def _extract_content(url)
     begin
-      options = Selenium::WebDriver::Edge::Options.new
-      options.add_argument('--headless')
-      driver = Selenium::WebDriver.for :edge, options: options
-      driver.get(url)
-
-      title = driver.title
-      body = driver.find_element(tag_name: 'body').text.gsub(/\s+/, ' ').strip
-
-      driver.quit
-      return { title: title, body: body }
-    rescue Selenium::WebDriver::Error::WebDriverError => e
-      puts "Error fetching #{url} with Selenium: #{e.message}"
-      return { title: nil, body: nil }
+      content_data = WebClient.new.open(url, headless: true) do |driver|
+        title = driver.title
+        body = driver.find_element(tag_name: 'body').text.gsub(/\s+/, ' ').strip
+        { title: title, body: body }
+      end
+      return content_data
     rescue => e
       puts "An unexpected error occurred while fetching #{url}: #{e.message}"
       return { title: nil, body: nil }
@@ -70,11 +62,9 @@ class SearchWeb
   end
   
   def search(search_word)
-    puts "検索ワード:#{search_word}"
-
     encoded_search_word = CGI.escape(search_word)
     url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
-    search_results = @web_client.open(url, wait_element: 'ol.react-results--main', headless: true) do |driver|
+    search_results = WebClient.new.open(url, wait_element: 'ol.react-results--main', headless: true) do |driver|
       results = []
       driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
       #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
@@ -101,30 +91,28 @@ class SearchWeb
     results = []
     json_data["search-themes"].each do |theme_data|
       theme_name = theme_data["theme"]
-      puts "テーマ名:"
-      p theme_name
-      # results[theme_name] = {}
+      puts "テーマ名:#{theme_name}, #{(results.size + 1)}/#{json_data["search-themes"].size}"
+
       item_words = []
       theme_data["search-words"].each do |search_word|
-        
-        # puts "    検索結果:"
-        # p search_results
-
-        puts "    コンテンツ抽出開始"
+        puts "Search Words: #{ (item_words.size + 1)}/#{theme_data["search-words"].size}"
+        search_results = search(search_word)
 
         item_contents = []
         search_results.take(3).each do |result|
+          puts "Extract Contents START: #{ (item_contents.size + 1)}/3}"
           if result[:url]
-            puts "      URL:"
-            p result[:url]
-            content = extract_content(result[:url])
-            puts "        コンテンツ抽出結果:"
+            start_time = Time.now
+            content = _extract_content(result[:url])
+            end_time = Time.now
+
             item_contents << {
               url: result[:url],
               title: content[:title],
               body: content[:body]
             }
           end
+          puts "Extract Contents END: #{end_time - start_time}秒"
         end
         item_words << {
           words: search_word,
