@@ -14,6 +14,7 @@ module Agent
     def invoke(user_request)
       puts "==== Creating strategy"
       strategy = make_strategy(user_request)
+      puts strategy
       puts "==== Seaching contents"
       contents = search(strategy["search-themes"])
       puts "==== Generate report"
@@ -34,7 +35,6 @@ module Agent
       r = client.generate_content({
           contents: [{ role: 'user', parts: [{ text: prompt }] }]
       })
-
       JSON.parse(r[:response]["content"]["parts"][0]["text"])
     end
 
@@ -110,4 +110,4 @@ def generate_report(contents, prompt)
   puts r[:response]["content"]["parts"][0]["text"]
 end
 
-Agent::DeepSearcher.new.invoke "Amazon DSQL、Google Cloud Spanner、TiDBを比較して。比較表も欲しい。"
+Agent::DeepSearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"

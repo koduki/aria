@@ -64,7 +64,6 @@ module Gemini
         http.request(request)
       end
 
-      p response
       response_body = JSON.parse(response.body)
       if response_body['candidates'] && !response_body['candidates'].empty?
         {
