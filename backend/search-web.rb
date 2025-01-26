@@ -12,25 +12,26 @@ class SearchWeb
       wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
 
       selenium_options = Selenium::WebDriver::Edge::Options.new
-      if options[:headless] == true
+      headless = oｆheadless]
+      if headless.nil? || headless == true
         selenium_options.add_argument('--headless')
       end
       driver = Selenium::WebDriver.for :edge, options: selenium_options
       driver.get(url)
 
-      begin
-        puts "'ol.react-results--main'要素の検索を開始"
-        wait = Selenium::WebDriver::Wait.new(timeout: 10) # 最大10秒待機
-        wait.until { driver.find_element(css: 'ol.react-results--main') }
-        puts "'ol.react-results--main'要素が見つかりました"
-      rescue Selenium::WebDriver::Error::TimeoutError => e
-        puts "タイムアウトエラー: 'ol.react-results--main'要素が見つかりませんでした"
-        puts "エラー詳細: #{e.message}"
-        return []
+      if options[:wait_element]
+        begin
+          puts "'#{options[:wait_element]}'要素の検索開始"
+          wait.until { driver.find_element(css: options[:wait_element]) }
+          puts "'#{options[:wait_element]}'要素の検索成功"
+        rescue Selenium::WebDriver::Error::TimeoutError => e
+          puts "タイムアウトエラー: '#{options[:wait_element]}'要素が見つかりませんでした"
+          puts "エラー詳細: #{e.message}"
+          return []
+        end
       end
 
       puts "oepn: #{url}"
-
       result = yield driver if block_given? # ブロックが与えられた場合のみ実行
       driver.quit
 
@@ -70,7 +71,7 @@ class SearchWeb
     p search_word
     encoded_search_word = CGI.escape(search_word)
     url = "https://duckduckgo.com/?q=#{encoded_search_word}&kl=wt-wt"
-    search_results = open(url, headless: true) do |driver| # headless অপশন যোগ করুন
+    search_results = open(url, wait_element: 'ol.react-results--main') do |driver|
       results = []
       driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
       #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
@@ -79,8 +80,6 @@ class SearchWeb
         title = title_element.text
         url = url_element.attribute('href')
   
-        p title
-        p url
         results << { url: url, title: title }
       end
       results
