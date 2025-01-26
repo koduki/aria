@@ -33,7 +33,7 @@ module Gemini
       @service = credentials[:service]
       @model = options[:model] || 'gemini-1.5-flash'
       @system_instruction = options[:system_instruction] || ''
-      @server_sent_events = options[:server_sent_events] || false
+      @json_mode = options[:json_mode] || false
     end
 
     def generate_content(payload)
@@ -44,9 +44,13 @@ module Gemini
           }
         }
       }
-      generation_config = {
-        'generationConfig': { 'response_mime_type': 'application/json' }
-      }
+      generation_config = if @json_mode
+                            {
+                              'generationConfig': { 'response_mime_type': 'application/json' }
+                            }
+                          else
+                            {}
+                          end
 
       payload = system_instruction.merge(generation_config).merge(payload)
 

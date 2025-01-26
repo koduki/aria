@@ -30,7 +30,7 @@ module Agent
           service: 'generative-language-api',
           api_key: @api_key
         },
-        options: { model: 'gemini-2.0-flash-exp'}
+        options: { model: 'gemini-2.0-flash-exp', json_mode:true}
       )
       r = client.generate_content({
           contents: [{ role: 'user', parts: [{ text: prompt }] }]
