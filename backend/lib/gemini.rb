@@ -53,12 +53,13 @@ module Gemini
                           end
 
       tools = {}
-      tools["find_movies"] = ->(args) {
-        location = args["location"]
-        description = args["description"]
+
+      def find_movies(location, description)
         puts "find_movies called with location: #{location}, description: #{description}"
         return "Hello"
-      }
+      end
+
+      tools["find_movies"] = method(:find_movies)
 
       tools_def = {
         "tools": [
@@ -116,7 +117,10 @@ module Gemini
             function_name = part['functionCall']['name']
             function_args = part['functionCall']['args']
             if tools && tools[function_name]
-              candidate['function_call_result'] = tools[function_name].call(function_args)
+              function_values = tools[function_name]
+                .parameters
+                .map { |_, name| function_args[name.to_s] }
+              candidate['function_call_result'] = tools[function_name].call(*function_values)
             end
           end
         end
