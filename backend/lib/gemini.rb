@@ -52,7 +52,50 @@ module Gemini
                             {}
                           end
 
-      payload = system_instruction.merge(generation_config).merge(payload)
+      tools = {}
+      tools["find_movies"] = ->(args) {
+        location = args["location"]
+        description = args["description"]
+        puts "find_movies called with location: #{location}, description: #{description}"
+        return "Hello"
+      }
+
+      tools_def = {
+        "tools": [
+          {
+            "function_declarations": [
+              {
+                "name": "find_movies",
+                "description": "find movie titles currently playing in theaters based on any description, genre, title words, etc.",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "location": {
+                      "type": "string",
+                      "description": "The city and state, e.g. San Francisco, CA or a zip code e.g. 95616"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Any kind of description including category or genre, title words, attributes, etc."
+                    }
+                  },
+                  "required": [
+                    "description"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+      tool_config = {
+        "tool_config": {
+          "function_calling_config": {
+            "mode": "ANY"
+          },
+        }
+      }
+      payload = system_instruction.merge(generation_config).merge(tools_def).merge(tool_config).merge(payload)
 
       # puts payload
       uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{@model}:generateContent?key=#{@api_key}")
@@ -66,9 +109,21 @@ module Gemini
 
       response_body = JSON.parse(response.body)
       if response_body['candidates'] && !response_body['candidates'].empty?
+        candidate = response_body['candidates'][0]
+        if candidate && candidate['content'] && candidate['content']['parts'] && candidate['content']['parts'][0]
+          part = candidate['content']['parts'][0]
+          if part['functionCall']
+            function_name = part['functionCall']['name']
+            function_args = part['functionCall']['args']
+            if tools && tools[function_name]
+              candidate['function_call_result'] = tools[function_name].call(function_args)
+            end
+          end
+        end
+
         {
           request: payload,
-          response: response_body['candidates'][0]
+          response: candidate
         }
       else
         nil
