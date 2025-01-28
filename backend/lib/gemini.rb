@@ -57,7 +57,7 @@ module Gemini
       tools = Tools.methods(false).each_with_object({}) do |method_name, hash|
         hash[method_name] = Tools.method(method_name)
       end
-      p tools
+
       tools_def = {
         "tools": [
           {

@@ -7,12 +7,9 @@ module Gemini
         description: description,
         params: params,
       }
-      "h"
-      p @method_doc[func_name]
     end
 
     def self.to_def(method_name)
-      p @method_doc
       method_metadata = @method_doc[method_name]
       {
         "name": method_name.to_s,
