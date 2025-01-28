@@ -1,6 +1,9 @@
 require 'net/http'
 require 'uri'
 require 'json'
+require_relative 'tools'
+
+
 
 module Gemini
   class History
@@ -51,45 +54,14 @@ module Gemini
                           else
                             {}
                           end
-      method_doc = {}
-      method_doc[:find_movies] = {
-        description: "find movie titles currently playing in theaters based on any description, genre, title words, etc.",
-        params: {
-          location: ["string","The city and state, e.g. San Francisco, CA or a zip code e.g. 95616"],
-          description: ["string","required","Any kind of description including category or genre, title words, attributes, etc."]
-        },
-      }
-      def find_movies(location, description)
-        puts "find_movies called with location: #{location}, description: #{description}"
-        return "Hello"
+      tools = Tools.methods(false).each_with_object({}) do |method_name, hash|
+        hash[method_name] = Tools.method(method_name)
       end
-
-      def mk_func_declaration method_name, method_doc
-        method_metadata = method_doc[method_name]
-        {
-          "name": method_name.to_s,
-          "description": method_metadata[:description],
-          "parameters": {
-            "type": "object",
-            "properties": method_metadata[:params].transform_values do |param|
-              {
-                "type": param[0],
-                "description": param[-1]
-              }
-            end,
-            "required": method_metadata[:params].select { |_, v| v.include?("required") }.keys.map(&:to_s)
-          }
-        }
-      end
-      
-
-      tools = {}
-      tools[:find_movies] = method(:find_movies)
-
+      p tools
       tools_def = {
         "tools": [
           {
-            "function_declarations": tools.keys.map { |tool_name| mk_func_declaration(tool_name, method_doc) }
+            "function_declarations": tools.keys.map { |tool_name| FunctionDecorator.to_def(tool_name) }
           }
         ]
       }
