@@ -51,41 +51,45 @@ module Gemini
                           else
                             {}
                           end
-
-      tools = {}
-
+      method_doc = {}
+      method_doc[:find_movies] = {
+        description: "find movie titles currently playing in theaters based on any description, genre, title words, etc.",
+        params: {
+          location: ["string","The city and state, e.g. San Francisco, CA or a zip code e.g. 95616"],
+          description: ["string","required","Any kind of description including category or genre, title words, attributes, etc."]
+        },
+      }
       def find_movies(location, description)
         puts "find_movies called with location: #{location}, description: #{description}"
         return "Hello"
       end
 
+      def mk_func_declaration method_name, method_doc
+        method_metadata = method_doc[method_name]
+        {
+          "name": method_name.to_s,
+          "description": method_metadata[:description],
+          "parameters": {
+            "type": "object",
+            "properties": method_metadata[:params].transform_values do |param|
+              {
+                "type": param[0],
+                "description": param[-1]
+              }
+            end,
+            "required": method_metadata[:params].select { |_, v| v.include?("required") }.keys.map(&:to_s)
+          }
+        }
+      end
+      
+
+      tools = {}
       tools["find_movies"] = method(:find_movies)
 
       tools_def = {
         "tools": [
           {
-            "function_declarations": [
-              {
-                "name": "find_movies",
-                "description": "find movie titles currently playing in theaters based on any description, genre, title words, etc.",
-                "parameters": {
-                  "type": "object",
-                  "properties": {
-                    "location": {
-                      "type": "string",
-                      "description": "The city and state, e.g. San Francisco, CA or a zip code e.g. 95616"
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Any kind of description including category or genre, title words, attributes, etc."
-                    }
-                  },
-                  "required": [
-                    "description"
-                  ]
-                }
-              }
-            ]
+            "function_declarations": [mk_func_declaration(:find_movies, method_doc)]
           }
         ]
       }
