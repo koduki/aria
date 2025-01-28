@@ -84,12 +84,12 @@ module Gemini
       
 
       tools = {}
-      tools["find_movies"] = method(:find_movies)
+      tools[:find_movies] = method(:find_movies)
 
       tools_def = {
         "tools": [
           {
-            "function_declarations": [mk_func_declaration(:find_movies, method_doc)]
+            "function_declarations": tools.keys.map { |tool_name| mk_func_declaration(tool_name, method_doc) }
           }
         ]
       }
