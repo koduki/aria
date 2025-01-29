@@ -1,4 +1,4 @@
-require_relative './decorator'
+require_relative 'gemini/decorator'
 
 module Tools
   Gemini::FunctionDecorator.doc(:find_movies,

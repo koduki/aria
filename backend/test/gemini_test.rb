@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require_relative '../lib/gemini'
+require_relative '../lib/gemini/gemini'
 
 class GeminiTest < Minitest::Test
   def _init_gemini
