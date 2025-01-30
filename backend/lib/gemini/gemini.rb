@@ -3,8 +3,6 @@ require 'uri'
 require 'json'
 require_relative '../tools'
 
-
-
 module Gemini
   class History
     def initialize
@@ -39,7 +37,7 @@ module Gemini
       @json_mode = options[:json_mode] || false
     end
 
-    def generate_content(payload)
+    def generate_content(payload, enable_tools = false)
       system_instruction = {
         'system_instruction': {
           'parts': {
@@ -54,25 +52,31 @@ module Gemini
                           else
                             {}
                           end
-      tools = Tools.methods(false).each_with_object({}) do |method_name, hash|
-        hash[method_name] = Tools.method(method_name)
+      tools_payload = {}
+      if enable_tools == true
+        puts "Helooooooooooooooo"
+        tools = Tools.methods(false).each_with_object({}) do |method_name, hash|
+          hash[method_name] = Tools.method(method_name)
+        end
+
+        tools_def = {
+          "tools": [
+            {
+              "function_declarations": tools.keys.map { |tool_name| FunctionDecorator.to_def(tool_name) }
+            }
+          ]
+        }
+        tool_config = {
+          "tool_config": {
+            "function_calling_config": {
+              "mode": "ANY"
+            },
+          }
+        }
+        tools_payload = tools_def.merge(tool_config)
       end
 
-      tools_def = {
-        "tools": [
-          {
-            "function_declarations": tools.keys.map { |tool_name| FunctionDecorator.to_def(tool_name) }
-          }
-        ]
-      }
-      tool_config = {
-        "tool_config": {
-          "function_calling_config": {
-            "mode": "ANY"
-          },
-        }
-      }
-      payload = system_instruction.merge(generation_config).merge(tools_def).merge(tool_config).merge(payload)
+      payload = system_instruction.merge(generation_config).merge(tools_payload).merge(payload)
 
       # puts payload
       uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{@model}:generateContent?key=#{@api_key}")
@@ -89,7 +93,7 @@ module Gemini
         candidate = response_body['candidates'][0]
         if candidate && candidate['content'] && candidate['content']['parts'] && candidate['content']['parts'][0]
           part = candidate['content']['parts'][0]
-          if part['functionCall']
+          if enable_tools && part['functionCall']
             function_name = part['functionCall']['name']
             function_args = part['functionCall']['args']
             if tools && tools[function_name]
@@ -119,7 +123,7 @@ module Gemini
 
       # 新しいユーザーメッセージを追加
       contents += [{ role: 'user', parts: [{ text: text }] }]
-      result = generate_content({ contents: contents})
+      result = generate_content({ contents: contents }, enable_tools)
       history.add(result)
       result
     end
