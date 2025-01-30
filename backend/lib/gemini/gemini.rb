@@ -1,7 +1,6 @@
 require 'net/http'
 require 'uri'
 require 'json'
-require_relative '../tools'
 
 module Gemini
   class History
@@ -37,7 +36,7 @@ module Gemini
       @json_mode = options[:json_mode] || false
     end
 
-    def generate_content(payload, enable_tools = false)
+    def generate_content(payload, tool_methods = nil)
       system_instruction = {
         'system_instruction': {
           'parts': {
@@ -53,10 +52,9 @@ module Gemini
                             {}
                           end
       tools_payload = {}
-      if enable_tools == true
-        puts "Helooooooooooooooo"
-        tools = Tools.methods(false).each_with_object({}) do |method_name, hash|
-          hash[method_name] = Tools.method(method_name)
+      if tool_methods
+        tools = tool_methods.methods(false).each_with_object({}) do |method_name, hash|
+          hash[method_name] = tool_methods.method(method_name)
         end
 
         tools_def = {
@@ -93,10 +91,10 @@ module Gemini
         candidate = response_body['candidates'][0]
         if candidate && candidate['content'] && candidate['content']['parts'] && candidate['content']['parts'][0]
           part = candidate['content']['parts'][0]
-          if enable_tools && part['functionCall']
-            function_name = part['functionCall']['name']
+          if part['functionCall']
+            function_name = part['functionCall']['name'].to_sym
             function_args = part['functionCall']['args']
-            if tools && tools[function_name]
+            if tools[function_name]
               function_values = tools[function_name]
                 .parameters
                 .map { |_, name| function_args[name.to_s] }
