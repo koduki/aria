@@ -7,6 +7,6 @@ module Tools
     description: ["string","required","Any kind of description including category or genre, title words, attributes, etc."]
   })
   def self.find_movies(location, description)
-    return "find_movies called with location: #{location}, description: #{description}"
+    return "find_movies called with location: #{location}, description: #{description}. The answer is StarGate."
   end
 end

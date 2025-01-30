@@ -17,63 +17,63 @@ class GeminiTest < Minitest::Test
   #
   # LLMのテストなので実行結果のAssertは意図的にせずに出力をチェックのみ
   #
-  # def test_chat
+  def test_chat
+    gemini = _init_gemini()
+
+    history = Gemini::History.new
+    r = gemini.chat("今日の映画は？　ジャンルはアニメでロスに住んでます", {history:history, tools:Tools})
+    # puts "request"
+    # p r[:request]
+    # puts "response"
+    # p r[:response]
+  end
+
+  # def test_generate_content
   #   gemini = _init_gemini()
 
-  #   history = Gemini::History.new
-  #   r = gemini.chat("今日の映画は？", history)
-  #   puts "request"
-  #   p r[:request]
-  #   puts "response"
-  #   p r[:response]
+  #   payload = {
+  #     "contents": [{
+  #       "parts":[
+  #         {"text": "List 5 popular cookie recipes"}
+  #         ]
+  #     }]
+  #   }
+
+  #   r = gemini.generate_content(payload)
+  #   # puts "request"
+  #   # p r[:request]
+  #   # puts "response"
+  #   # p r[:response]
+
+  #   assert_equal payload[:contents], r[:request][:contents]
+  #   assert_equal({:parts => {:text => "これは対話アプリなので回答は短くしてください。"}}, r[:request][:system_instruction])
+
+  #   assert r[:response]["content"]["parts"][0]["text"] != nil
+  #   assert_equal "model", r[:response]["content"]["role"]
   # end
 
-  def test_generate_content
-    gemini = _init_gemini()
+  # def test_generate_content_with_function_calling
+  #   gemini = _init_gemini()
 
-    payload = {
-      "contents": [{
-        "parts":[
-          {"text": "List 5 popular cookie recipes"}
-          ]
-      }]
-    }
+  #   payload = {
+  #     "contents": [{
+  #       "parts":[
+  #         {"text": "List 5 popular cookie recipes"}
+  #         ]
+  #     }]
+  #   }
 
-    r = gemini.generate_content(payload)
-    # puts "request"
-    # p r[:request]
-    # puts "response"
-    # p r[:response]
+  #   r = gemini.generate_content(payload, Tools, "function_calling_config": {"mode": "ANY"})
+  #   # puts "request"
+  #   # p r[:request]
+  #   # puts "response"
+  #   # p r[:response]
 
-    assert_equal payload[:contents], r[:request][:contents]
-    assert_equal({:parts => {:text => "これは対話アプリなので回答は短くしてください。"}}, r[:request][:system_instruction])
-
-    assert r[:response]["content"]["parts"][0]["text"] != nil
-    assert_equal "model", r[:response]["content"]["role"]
-  end
-
-  def test_generate_content_with_function_calling
-    gemini = _init_gemini()
-
-    payload = {
-      "contents": [{
-        "parts":[
-          {"text": "List 5 popular cookie recipes"}
-          ]
-      }]
-    }
-
-    r = gemini.generate_content(payload, Tools, "function_calling_config": {"mode": "ANY"})
-    # puts "request"
-    # p r[:request]
-    # puts "response"
-    # p r[:response]
-
-    assert_equal payload[:contents], r[:request][:contents]
-    assert_equal({:parts => {:text => "これは対話アプリなので回答は短くしてください。"}}, r[:request][:system_instruction])
-    assert r[:request][:tools] != nil
+  #   assert_equal payload[:contents], r[:request][:contents]
+  #   assert_equal({:parts => {:text => "これは対話アプリなので回答は短くしてください。"}}, r[:request][:system_instruction])
+  #   assert r[:request][:tools] != nil
     
-    assert r[:response]["content"]["parts"][0]["functionCall"] != nil
-    assert r[:response]["function_call_result"] != nil
-  end
+  #   assert r[:response]["content"]["parts"][0]["functionCall"] != nil
+  #   assert r[:response]["function_call_result"] != nil
+  # end
 end

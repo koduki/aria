@@ -21,9 +21,9 @@ module Gemini
 
       # モデルの応答を保存
       model_message = { role: 'model', parts: [{ text: result[:response]['content']['parts'][0]['text'] }] }
-      @history.push(model_message)
+      @history.push(model_message)      
 
-      puts "history updated: #{@history.inspect}"
+      # puts "history updated: #{@history.inspect}"
     end
   end
 
@@ -90,8 +90,8 @@ module Gemini
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
         http.request(request)
       end
-
       response_body = JSON.parse(response.body)
+      # puts response_body
       if response_body['candidates'] && !response_body['candidates'].empty?
         candidate = response_body['candidates'][0]
         if candidate && candidate['content'] && candidate['content']['parts'] && candidate['content']['parts'][0]
@@ -117,7 +117,9 @@ module Gemini
       end
     end
 
-    def chat(text, history)
+    def chat(text, options)
+      history = options[:history]
+      tools = options[:tools]
       puts "text: #{text}"
       puts "chat history: #{history.get.inspect}"
 
@@ -126,8 +128,47 @@ module Gemini
 
       # 新しいユーザーメッセージを追加
       contents += [{ role: 'user', parts: [{ text: text }] }]
-      result = generate_content({ contents: contents }, enable_tools)
-      history.add(result)
+      result = generate_content({ contents: contents }, tools)
+
+      if result[:response]["function_call_result"]
+        # p function_call
+        function_call = { role: 'model', parts: [{ functionCall: result[:response]['content']['parts'][0]['functionCall'] }] }
+        # p function_result
+        function_result = { 
+          role: 'user', 
+          parts: [{
+            "functionResponse": {
+              "name": "find_theaters",
+              "response": {
+                "name": "find_theaters",
+                "content": {
+                  "movie": "Barbie",
+                  "theaters": [{
+                    "name": "AMC Mountain View 16",
+                    "address": "2000 W El Camino Real, Mountain View, CA 94040"
+                  }, {
+                    "name": "Regal Edwards 14",
+                    "address": "245 Castro St, Mountain View, CA 94040"
+                  }]
+                }
+              }
+            }
+          }]
+        }
+
+        contents = history.get
+        contents += [{ role: 'user', parts: [{ text: text }] }]
+        contents += [function_call]
+        contents += [function_result]
+
+        result = generate_content({ contents: contents })
+        puts "result:==========="
+        p result
+      end
+
+      # history.add(result)
+      # puts history.get
+      # p result
       result
     end
   end
