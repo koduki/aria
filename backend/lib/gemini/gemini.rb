@@ -129,7 +129,7 @@ module Gemini
       # 新しいユーザーメッセージを追加
       contents += [{ role: 'user', parts: [{ text: text }] }]
       result = generate_content({ contents: contents }, tools)
-
+p result[:response]["function_call_result"]
       if result[:response]["function_call_result"]
         # p function_call
         function_call = { role: 'model', parts: [{ functionCall: result[:response]['content']['parts'][0]['functionCall'] }] }
