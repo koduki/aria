@@ -36,7 +36,7 @@ module Gemini
       @json_mode = options[:json_mode] || false
     end
 
-    def generate_content(payload, tool_methods = nil)
+    def generate_content(payload, tool_methods = nil, tool_config=nil)
       system_instruction = {
         'system_instruction': {
           'parts': {
@@ -64,14 +64,19 @@ module Gemini
             }
           ]
         }
-        tool_config = {
-          "tool_config": {
-            "function_calling_config": {
-              "mode": "ANY"
-            },
+
+        tool_options = if tool_config.nil?
+          {
+            "tool_config": {
+              "function_calling_config": {
+                "mode": "AUTO"
+              },
+            }
           }
-        }
-        tools_payload = tools_def.merge(tool_config)
+        else
+          { "tool_config": tool_config }
+        end
+        tools_payload = tools_def.merge(tool_options)
       end
 
       payload = system_instruction.merge(generation_config).merge(tools_payload).merge(payload)

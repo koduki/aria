@@ -63,7 +63,7 @@ class GeminiTest < Minitest::Test
       }]
     }
 
-    r = gemini.generate_content(payload, Tools)
+    r = gemini.generate_content(payload, Tools, "function_calling_config": {"mode": "ANY"})
     # puts "request"
     # p r[:request]
     # puts "response"
