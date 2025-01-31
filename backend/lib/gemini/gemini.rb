@@ -121,10 +121,35 @@ module Gemini
       end
     end
 
+    def handle_function_call_result(result, text, history)
+      function_call = { role: 'model', parts: [{ functionCall: result[:response]['content']['parts'][0]['functionCall'] }] }
+      func_name = function_call[:parts][0][:functionCall]["name"]
+
+      function_result = { 
+        role: 'user', 
+        parts: [{
+          "functionResponse": {
+            "name": func_name,
+            "response": {
+              "name": func_name,
+              "content": result[:response]["function_call_result"]
+            }
+          }
+        }]
+      }
+
+      contents = history.get
+      contents += [{ role: 'user', parts: [{ text: text }] }]
+      contents += [function_call]
+      contents += [function_result]
+
+      generate_content({ contents: contents })
+    end
+
     def chat(text, options)
       history = options[:history]
       tools = options[:tools]
-      puts "text: #{text}"
+      # puts "text: #{text}"
       puts "chat history: #{history.get.inspect}"
 
       # contentsを初期化 (history を考慮)
@@ -135,28 +160,7 @@ module Gemini
       result = generate_content({ contents: contents }, tools)
 
       if result[:response]["function_call_result"]
-        function_call = { role: 'model', parts: [{ functionCall: result[:response]['content']['parts'][0]['functionCall'] }] }
-        func_name = function_call[:parts][0][:functionCall]["name"]
-
-        function_result = { 
-          role: 'user', 
-          parts: [{
-            "functionResponse": {
-              "name": func_name,
-              "response": {
-                "name": func_name,
-                "content": result[:response]["function_call_result"]
-              }
-            }
-          }]
-        }
-
-        contents = history.get
-        contents += [{ role: 'user', parts: [{ text: text }] }]
-        contents += [function_call]
-        contents += [function_result]
-
-        result = generate_content({ contents: contents })
+        result = handle_function_call_result(result, text, history)
       end
 
       history.add(result)
