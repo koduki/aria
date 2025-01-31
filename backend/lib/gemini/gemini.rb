@@ -16,14 +16,18 @@ module Gemini
       return unless result
 
       # ユーザーの入力を保存
-      user_message = { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
+      user_message = if result[:request][:contents][1][:parts][0][:functionCall]
+        { role: 'user', parts: [{ text:result[:request][:contents][0][:parts][0][:text] }] }
+      else
+        { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
+      end
       @history.push(user_message)
 
       # モデルの応答を保存
       model_message = { role: 'model', parts: [{ text: result[:response]['content']['parts'][0]['text'] }] }
       @history.push(model_message)      
 
-      # puts "history updated: #{@history.inspect}"
+      puts "history updated: #{@history.inspect}"
     end
   end
 
@@ -129,28 +133,19 @@ module Gemini
       # 新しいユーザーメッセージを追加
       contents += [{ role: 'user', parts: [{ text: text }] }]
       result = generate_content({ contents: contents }, tools)
-p result[:response]["function_call_result"]
+
       if result[:response]["function_call_result"]
-        # p function_call
         function_call = { role: 'model', parts: [{ functionCall: result[:response]['content']['parts'][0]['functionCall'] }] }
-        # p function_result
+        func_name = function_call[:parts][0][:functionCall]["name"]
+
         function_result = { 
           role: 'user', 
           parts: [{
             "functionResponse": {
-              "name": "find_theaters",
+              "name": func_name,
               "response": {
-                "name": "find_theaters",
-                "content": {
-                  "movie": "Barbie",
-                  "theaters": [{
-                    "name": "AMC Mountain View 16",
-                    "address": "2000 W El Camino Real, Mountain View, CA 94040"
-                  }, {
-                    "name": "Regal Edwards 14",
-                    "address": "245 Castro St, Mountain View, CA 94040"
-                  }]
-                }
+                "name": func_name,
+                "content": result[:response]["function_call_result"]
               }
             }
           }]
@@ -162,13 +157,9 @@ p result[:response]["function_call_result"]
         contents += [function_result]
 
         result = generate_content({ contents: contents })
-        puts "result:==========="
-        p result
       end
 
-      # history.add(result)
-      # puts history.get
-      # p result
+      history.add(result)
       result
     end
   end
