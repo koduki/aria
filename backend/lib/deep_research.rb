@@ -110,4 +110,4 @@ def generate_report(contents, prompt)
   puts r[:response]["content"]["parts"][0]["text"]
 end
 
-Agent::DeepResearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"
+# Agent::DeepResearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"

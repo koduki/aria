@@ -58,7 +58,7 @@ class GeminiTest < Minitest::Test
     payload = {
       "contents": [{
         "parts":[
-          {"text": "List 5 popular cookie recipes"}
+          {"text": "今日のおすすめの映画？"}
           ]
       }]
     }

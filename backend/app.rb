@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'json'
-require_relative './lib/gemini'
+require_relative './lib/gemini/gemini'
+require_relative './lib/tools'
 
 # API keyの読み込み
 api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
@@ -22,7 +23,7 @@ post '/api/chat' do
   request_body = JSON.parse(request.body.read)
   text = request_body['text']
 
-  result = client.chat(text, $history)
+  result = client.chat(text, {history:$history, tools:Tools})
 
   result.to_json
 end
