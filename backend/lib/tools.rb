@@ -1,4 +1,5 @@
 require_relative 'gemini/decorator'
+require_relative 'deep_research'
 
 module Tools
   Gemini::FunctionDecorator.doc(:find_movies,
@@ -9,4 +10,15 @@ module Tools
   def self.find_movies(location, description)
     return "find_movies called with location: #{location}, description: #{description}. The answer is StarGate."
   end
+
+  Gemini::FunctionDecorator.doc(:deep_research,
+    "Executes DeepResearch based on the user's request to generate strategy, search results, and a report.",
+    {
+      user_request: ["string", "required", "The user's research request."]
+    }
+  )
+  def self.deep_research(user_request)
+    return Agent::DeepResearcher.new.invoke(user_request)
+  end
+
 end
