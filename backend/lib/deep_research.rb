@@ -1,12 +1,12 @@
 require 'json'
 require 'erb'
 
-require_relative './gemini'
+require_relative './gemini/gemini'
 require_relative './web_search'
 require_relative './web_client'
 
 module Agent
-  class DeepSearcher
+  class DeepResearcher
     def initialize
       @api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
     end
@@ -110,4 +110,4 @@ def generate_report(contents, prompt)
   puts r[:response]["content"]["parts"][0]["text"]
 end
 
-Agent::DeepSearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"
+Agent::DeepResearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"
