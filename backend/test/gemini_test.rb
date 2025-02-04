@@ -22,6 +22,8 @@ class GeminiTest < Minitest::Test
 
     history = Gemini::History.new
     r = gemini.chat("今日の映画は？　ジャンルはアニメでロスに住んでます", {history:history, tools:Tools})
+    # r = gemini.chat("DeepResearchについて検索してレポートを作って", {history:history, tools:Tools})
+
     # puts "request"
     # p r[:request]
     # puts "response"

@@ -16,8 +16,7 @@ module Gemini
       return unless result
 
       # ユーザーの入力を保存
-      p result[:request][:contents]
-      user_message = if result[:request][:contents][1][:parts][0][:functionCall]
+      user_message = if result[:request][:contents][1] and result[:request][:contents][1][:parts][0][:functionCall]
         { role: 'user', parts: [{ text:result[:request][:contents][0][:parts][0][:text] }] }
       else
         { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
