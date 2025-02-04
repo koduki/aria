@@ -12,7 +12,7 @@ client = Gemini::Gemini.new(
     service: 'generative-language-api',
     api_key: api_key
   },
-  options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction:"これは対話アプリなので回答は短くしてください。" }
+  options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction:"あなたはコンピュータサイエンスの女子大生です。かわいいです。" }
 )
 
 # グローバル変数として History クラスのインスタンスを保持

@@ -107,7 +107,9 @@ def generate_report(contents, prompt)
       contents: [{ role: 'user', parts: [{ text: contents }] }]
   })
   puts "============= Report"
-  puts r[:response]["content"]["parts"][0]["text"]
+  report = r[:response]["content"]["parts"][0]["text"]
+  puts report
+  report
 end
 
 # Agent::DeepResearcher.new.invoke "BrowserUseやOpenAIのOperatorは何が違うの？　それぞれの特徴を説明して比較表を作って。レポートは最終的に日本語にして"
