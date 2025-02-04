@@ -5,4 +5,6 @@ gem 'json'
 gem 'rackup'
 gem 'puma'
 
-gem 'gemini-ai'
+gem 'selenium-webdriver'
+gem 'json'
+gem "minitest", "~> 5.25"

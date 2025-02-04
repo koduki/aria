@@ -22,7 +22,7 @@
 
     /* 表示用ウインドウのスタイル */
     .display-window {
-      width: 300px;  /* 必要に応じて調整 */
+      width: 300px;  /* 元の幅に戻す */
       padding: 10px;
       background-color: #ffffff;
       border: 2px solid #cccccc;
@@ -30,6 +30,8 @@
       box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
       margin-bottom: 10px;
       text-align: left;
+      overflow-y: auto; /* 縦スクロールバーを有効にする */
+      max-height: 400px; /* 高さを調整 */
     }
     .display-window p {
       margin: 0;

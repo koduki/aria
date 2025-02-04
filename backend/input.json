@@ -1,0 +1,41 @@
+{
+    "search-themes": [
+      {
+        "theme": "Overview of the Stargate Project",
+        "search-words": [
+          "Stargate Project history",
+          "CIA Stargate Project",
+          "remote viewing Stargate",
+          "Stargate Project details"
+        ]
+      },
+      {
+        "theme": "Presidential Executive Orders and their relation to classified programs",
+        "search-words": [
+          "Presidential Executive Orders classified programs",
+          "Executive Orders national security",
+          "declassification Presidential records",
+          "legal basis Executive Orders"
+        ]
+      },
+      {
+        "theme": "Claims of Trump's involvement with the Stargate Project",
+        "search-words": [
+          "Trump Stargate Project claims",
+          "Trump declassify Stargate",
+          "QAnon Stargate Trump",
+          "Stargate Project Trump conspiracy"
+        ]
+      },
+      {
+        "theme": "Analysis of the evidence (or lack thereof) for Trump's involvement",
+        "search-words": [
+          "debunking Trump Stargate claims",
+          "fact-checking Trump Stargate",
+          "evidence Stargate Project Trump",
+          "media coverage Trump Stargate"
+        ]
+      }
+    ],
+    "report-creation-prompt": "**Please create a report in Japanese using Markdown format, following the steps and policies outlined below. Use only the information provided by the search results as the sole source (grounding), and avoid careless speculation or supplementation that could lead to hallucinations.**\n\n1. **Use only the information given by the search results.** If additional information is needed or there are unclear points in the provided data, do not resort to speculation or external sources.\n2. **Extract key information from the search results for each theme and summarize it concisely.**\n3. **Integrate the summaries of each theme to create a coherent report addressing the user's question: \"トランプ大統領が大統領令を出した「スターゲートプロジェクト」について\".**\n4. **Structure of the report:**\n - First, provide a general overview of the Stargate Project, including its history and purpose.\n - Next, explain the role of Presidential Executive Orders in the context of classified programs and national security.\n - Then, summarize the claims and allegations regarding President Trump's involvement with the Stargate Project, specifically focusing on the supposed Executive Order.\n - Finally, analyze the available evidence (or lack thereof) supporting these claims, presenting any counterarguments or debunking information found in the search results.\n\n**Please adhere strictly to these rules when creating the report.**"
+  }
