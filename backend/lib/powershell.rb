@@ -7,31 +7,28 @@ class PowerShell
 
  def run(command)
     @powershell.puts(command)
+    sleep(0.1) # Wait for command to execute
     output = ''
     loop do
       ready = IO.select([@powershell], [], [], 0.1) # Timeout after 0.1 seconds
       break unless ready
 
       begin
-        output += @powershell.read_nonblock(256)
+        chunk = @powershell.read_nonblock(256)
+        # Only include lines that start with the command output
+        output += chunk.encode('UTF-8', invalid: :replace, undef: :replace)
       rescue EOFError
         break
       end
     end
-    { stdout: output, stderr: '', status: $? }
+    
+    # Extract actual command output (after the prompt)
+    lines = output.split("\n")
+    actual_output = lines.select { |line| !line.strip.start_with?('PS ') && !line.include?('PSReadline') }
+    { stdout: actual_output.join("\n"), stderr: '', status: $? }
   end
 
   def close
     @powershell.close
   end
 end
-
-# Test code
-ps = PowerShell.new
-result = ps.run('$testVar = "Hello from PowerShell"')
-puts "Result 1: #{result[:stdout]}"
-
-result2 = ps.run('Write-Host $testVar')
-puts "Result 2: #{result2[:stdout]}"
-
-ps.close
