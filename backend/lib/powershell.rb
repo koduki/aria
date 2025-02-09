@@ -2,7 +2,7 @@ require 'open3'
 
 class PowerShell
   def initialize
-    @powershell = IO.popen('powershell', 'r+')
+    @powershell = IO.popen('powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass', 'r+')
   end
 
  def run(command)
