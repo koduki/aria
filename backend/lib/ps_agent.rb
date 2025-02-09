@@ -36,7 +36,6 @@ end
 
 
 response = parse(r[:response]["content"]["parts"][0]["text"])
-p response
 
 # puts response["thinking"]
 task = response["task"]
@@ -46,8 +45,16 @@ task = response["task"]
 
 
 # テストコード例
-result = ps.invoke("$videoPath = [Environment]::GetFolderPath('MyVideos'); " \
-                "$source = Join-Path $videoPath '2024年7月'; " \
-                "if (!(Test-Path -Path $source)) { Write-Host 'Source directory does not exist.' }; " \
-                "Get-ChildItem -Path $source")
-puts "Result: #{result[:stdout]}"
+# result = ps.invoke("$videoPath = [Environment]::GetFolderPath('MyVideos'); " \
+#                 "$source = Join-Path $videoPath '2024年7月'; " \
+#                 "if (!(Test-Path -Path $source)) { Write-Host 'Source directory does not exist.' }; " \
+#                 "Get-ChildItem -Path $source")
+# puts "Result: #{result[:stdout]}"
+
+multiline_command = <<~POWERSHELL
+$x = 10
+$y = 20
+Write-Host ($x + $y)
+POWERSHELL
+p multiline_command
+p ps.invoke('$videoPath = [Environment]::GetFolderPath(\'MyVideos\')\n$targetFolderName = \'7月動画\'\n$targetPath = Join-Path -Path $videoPath -ChildPath $targetFolderName\nif (!(Test-Path -Path $targetPath)) {\n  New-Item -ItemType Directory -Path $targetPath\n}\nGet-ChildItem -Path $videoPath -File | Where-Object {$_.LastWriteTime.Month -eq 7} | ForEach-Object {Move-Item -Path $_.FullName -Destination $targetPath}')

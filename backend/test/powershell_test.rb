@@ -35,4 +35,14 @@ class PowerShellTest < Minitest::Test
     assert_includes result.keys, :stderr
     assert_includes result.keys, :status
   end
+
+  def test_multiline_command
+    multiline_command = <<~POWERSHELL
+      $x = 10
+      $y = 20
+      Write-Host ($x + $y)
+    POWERSHELL
+    result = @ps.invoke(multiline_command)
+    assert_includes result[:stdout], "30"
+  end
 end
