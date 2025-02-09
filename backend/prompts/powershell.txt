@@ -27,53 +27,39 @@
 
 以下の JSON 形式で出力してください（余計な出力はしない）。
 
-```json
 {
-  "response": {
-    "finish": true | false,
-    "thinking": "ここに思考内容（意図、環境、リスク評価など）を記述",
-    "task": "ここに実行する PowerShell または cmd コマンドを記述",
-    "request": "必要な確認・問い合わせ内容を記述"
-  }
+  "finish": true | false,
+  "thinking": "ここに思考内容（意図、環境、リスク評価など）を記述",
+  "task": "ここに実行する PowerShell または cmd コマンドを記述",
+  "request": "必要な確認・問い合わせ内容を記述"
 }
-```
 
 ---
 
 **例**
 
 - **初期タスク生成**
-  ```json
   {
-    "response": {
-      "finish": false,
-      "thinking": "ビデオフォルダ内の動画整理が目的。まずパスを取得して内容を確認する。",
-      "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\nGet-ChildItem -Path $videoPath",
-      "request": ""
-    }
+    "finish": false,
+    "thinking": "ビデオフォルダ内の動画整理が目的。まずパスを取得して内容を確認する。",
+    "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\nGet-ChildItem -Path $videoPath",
+    "request": ""
   }
-  ```
 
 - **ユーザー確認依頼**
-  ```json
   {
-    "response": {
-      "finish": false,
-      "thinking": "移動元と移動先の内容が正しいか確認する。",
-      "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nGet-ChildItem -Path $videoPath\nGet-ChildItem -Path $target",
-      "request": "移動元と移動先の内容をご確認ください。"
-    }
+    "finish": false,
+    "thinking": "移動元と移動先の内容が正しいか確認する。",
+    "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nGet-ChildItem -Path $videoPath\nGet-ChildItem -Path $target",
+    "request": "移動元と移動先の内容をご確認ください。"
   }
-  ```
 
 - **作業完了報告**
-  ```json
   {
-    "response": {
-      "finish": true,
-      "thinking": "作業が完了したので、移動先フォルダをユーザーに確認してもらう。",
-      "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nInvoke-Item $target",
-      "request": "作業が完了しました。内容をご確認ください。"
-    }
+    "finish": true,
+    "thinking": "作業が完了したので、移動先フォルダをユーザーに確認してもらう。",
+    "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nInvoke-Item $target",
+    "request": "作業が完了しました。内容をご確認ください。"
   }
-  ```
+
+The output must be strictly in JSON format only, with no additional content. Do not include any Markdown formatting markers such as "```json".
