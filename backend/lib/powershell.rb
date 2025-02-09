@@ -5,7 +5,7 @@ class PowerShell
     @powershell = IO.popen('powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass', 'r+')
   end
 
- def run(command)
+ def invoke(command)
     @powershell.puts(command)
     sleep(0.1) # Wait for command to execute
     output = ''
