@@ -36,6 +36,13 @@ class PowerShellTest < Minitest::Test
     assert_includes result.keys, :status
   end
 
+  def test_stderr_generation
+    result = @ps.invoke('Write-Error "意図的なエラーです"')
+    p result
+    assert_includes result[:stderr], "意図的なエラーです"
+    assert_operator result[:status], :>, 0
+  end
+
   def test_multiline_command
     multiline_command = <<~POWERSHELL
       $x = 10

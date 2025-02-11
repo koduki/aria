@@ -57,4 +57,16 @@ $y = 20
 Write-Host ($x + $y)
 POWERSHELL
 p multiline_command
-p ps.invoke('$videoPath = [Environment]::GetFolderPath(\'MyVideos\')\n$targetFolderName = \'7月動画\'\n$targetPath = Join-Path -Path $videoPath -ChildPath $targetFolderName\nif (!(Test-Path -Path $targetPath)) {\n  New-Item -ItemType Directory -Path $targetPath\n}\nGet-ChildItem -Path $videoPath -File | Where-Object {$_.LastWriteTime.Month -eq 7} | ForEach-Object {Move-Item -Path $_.FullName -Destination $targetPath}')
+
+command = <<~POWERSHELL
+$videoPath = [Environment]::GetFolderPath('MyVideos')
+$targetFolderName = '7月動画'
+$targetPath = Join-Path -Path $videoPath -ChildPath $targetFolderName
+New-Item -ItemType Directory -Path $targetPath
+Get-ChildItem -Path $targetPath 
+POWERSHELL
+command_cp932 = command.encode("CP932", invalid: :replace, undef: :replace)
+
+
+# p ps.invoke('$videoPath = [Environment]::GetFolderPath(\'MyVideos\')\n$targetFolderName = \'7月動画\'\n$targetPath = Join-Path -Path $videoPath -ChildPath $targetFolderName\nif (!(Test-Path -Path $targetPath)) {\n  New-Item -ItemType Directory -Path $targetPath\n}\nGet-ChildItem -Path $videoPath -File | Where-Object {$_.LastWriteTime.Month -eq 7} | ForEach-Object {Move-Item -Path $_.FullName -Destination $targetPath}')
+p ps.invoke(command_cp932)
