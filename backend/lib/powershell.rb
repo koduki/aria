@@ -1,34 +1,60 @@
 require 'open3'
+require 'nkf' # nkf を require に追加
 
 class PowerShell
   def initialize
-    @powershell = IO.popen('powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass', 'r+')
+    command = String.new('powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass')
+    @stdin, @stdout, @stderr, @wait_thr = Open3.popen3(command)
   end
 
- def invoke(command)
-    @powershell.puts(command)
-    sleep(0.1) # Wait for command to execute
-    output = ''
+  def invoke(command)
+    @stdin.puts(command)
+    @stdin.flush
+    sleep(0.1) # コマンド実行待ち（必要に応じて調整）
+    out_buffer = ''
+    err_buffer = ''
+
     loop do
-      ready = IO.select([@powershell], [], [], 0.1) # Timeout after 0.1 seconds
+      ready = IO.select([@stdout, @stderr], nil, nil, 0.1)
       break unless ready
 
-      begin
-        chunk = @powershell.read_nonblock(256)
-        # Only include lines that start with the command output
-        output += chunk.encode('UTF-8', invalid: :replace, undef: :replace)
-      rescue EOFError
-        break
+      ready[0].each do |io|
+        begin
+          chunk = io.read_nonblock(256)
+          # chunk = chunk.encode('UTF-8', invalid: :replace, undef: :replace) # 削除
+          chunk = NKF.nkf('-w', chunk.force_encoding('Shift_JIS')) # 修正
+
+          if io == @stdout
+            out_buffer += chunk
+          else
+            err_buffer += chunk
+          end
+        rescue EOFError, IO::WaitReadable
+          next
+        end
       end
     end
+
+    # 不要な行を除去
+    out_lines = out_buffer.split("\n")
+    out_actual = out_lines.reject { |line| line.strip.start_with?('PS ') || line.include?('PSReadline') }
+
+    err_lines = err_buffer.split("\n")
+    err_actual = err_lines.reject { |line| line.strip.start_with?('PS ') || line.include?('PSReadline') }
     
-    # Extract actual command output (after the prompt)
-    lines = output.split("\n")
-    actual_output = lines.select { |line| !line.strip.start_with?('PS ') && !line.include?('PSReadline') }
-    { stdout: actual_output.join("\n"), stderr: '', status: $? }
+    {
+      stdout: out_actual.join("\n"),
+      stderr: err_actual.join("\n"),
+      status: (err_actual.empty? ? 0 : 1)
+    }
   end
 
   def close
-    @powershell.close
+    @stdin.puts("exit")
+    @stdin.flush
+    @stdin.close unless @stdin.closed?
+    @stdout.close unless @stdout.closed?
+    @stderr.close unless @stderr.closed?
+    @wait_thr.join if @wait_thr
   end
 end
