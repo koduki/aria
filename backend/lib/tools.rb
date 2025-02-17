@@ -1,5 +1,5 @@
 require_relative 'gemini/decorator'
-require_relative 'deep_research'
+require_relative 'agents/deep_research'
 
 module Tools
   Gemini::FunctionDecorator.doc(:find_movies,

@@ -27,7 +27,7 @@ module Gemini
       model_message = { role: 'model', parts: [{ text: result[:response]['content']['parts'][0]['text'] }] }
       @history.push(model_message)      
 
-      puts "history updated: #{@history.inspect}"
+      # puts "history updated: #{@history.inspect}"
     end
   end
 
@@ -150,7 +150,7 @@ module Gemini
       history = options[:history]
       tools = options[:tools]
       # puts "text: #{text}"
-      puts "chat history: #{history.get.inspect}"
+      # puts "chat history: #{history.get.inspect}"
 
       # contentsを初期化 (history を考慮)
       contents = history.get

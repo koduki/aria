@@ -10,7 +10,7 @@ class PowerShell
   def invoke(command)
     @stdin.puts(command)
     @stdin.flush
-    sleep(0.1) # コマンド実行待ち（必要に応じて調整）
+    sleep(0.5) # コマンド実行待ち（必要に応じて調整）
     out_buffer = ''
     err_buffer = ''
 
