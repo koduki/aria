@@ -1,9 +1,9 @@
 require 'json'
 require 'erb'
 
-require_relative './gemini/gemini'
-require_relative './web_search'
-require_relative './web_client'
+require_relative '../gemini/gemini'
+require_relative '../web_search'
+require_relative '../web_client'
 
 module Agent
   class DeepResearcher

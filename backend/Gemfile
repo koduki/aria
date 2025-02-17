@@ -8,3 +8,4 @@ gem 'puma'
 gem 'selenium-webdriver'
 gem 'json'
 gem "minitest", "~> 5.25"
+gem 'nkf'

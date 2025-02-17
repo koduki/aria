@@ -50,15 +50,15 @@
   {
     "finish": false,
     "thinking": "移動元と移動先の内容が正しいか確認する。",
-    "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nGet-ChildItem -Path $videoPath\nGet-ChildItem -Path $target",
-    "request": "移動元と移動先の内容をご確認ください。"
+    "task": "",
+    "request": "移動元と移動先の内容が正しいか確認してください。"
   }
 
 - **作業完了報告**
   {
     "finish": true,
     "thinking": "作業が完了したので、移動先フォルダをユーザーに確認してもらう。",
-    "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\n$target = Join-Path $videoPath '2024年10月'\nInvoke-Item $target",
+    "task": "",
     "request": "作業が完了しました。内容をご確認ください。"
   }
 

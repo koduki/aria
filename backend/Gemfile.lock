@@ -10,6 +10,8 @@ GEM
       ruby2_keywords (~> 0.0.1)
     nio4r (2.7.4)
     nio4r (2.7.4-java)
+    nkf (0.2.0)
+    nkf (0.2.0-java)
     puma (6.5.0)
       nio4r (~> 2.0)
     puma (6.5.0-java)
@@ -50,6 +52,7 @@ PLATFORMS
 DEPENDENCIES
   json
   minitest (~> 5.25)
+  nkf
   puma
   rackup
   selenium-webdriver
