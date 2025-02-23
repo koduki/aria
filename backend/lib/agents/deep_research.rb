@@ -23,7 +23,7 @@ module Agent
     end
 
     def make_strategy(user_request)
-      prompt_path = File.join(__dir__, "../prompts/deep_research_strategy.json.erb")
+      prompt_path = File.join(__dir__, "./prompts/deep_research_strategy.json.erb")
       prompt = ERB.new(File.read(prompt_path)).result_with_hash({ user_request: user_request })
       client = Gemini::Gemini.new(
         credentials: {

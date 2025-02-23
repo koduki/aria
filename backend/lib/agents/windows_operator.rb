@@ -9,7 +9,7 @@ module Agent
             @ps = PowerShell.new
             @history = Gemini::History.new
             @api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
-            sysprompt = open('prompts/powershell.txt').read
+            sysprompt = open(File.join(__dir__, "./prompts/powershell.txt")).read
 
             @client = Gemini::Gemini.new(
             credentials: {
