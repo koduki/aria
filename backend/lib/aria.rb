@@ -25,3 +25,17 @@ class Aria
     result.to_json
   end
 end
+
+if __FILE__ == $0
+    aria = Aria.new
+    while true
+        print "> "
+        user_input = gets.chomp
+        reply = aria.chat(user_input)
+        p reply
+        response = JSON.parse(reply)["response"]
+        puts "#begin"
+        puts response["content"]["parts"][0]["text"]
+        puts "#end"
+    end
+end
