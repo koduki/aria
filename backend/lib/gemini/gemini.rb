@@ -145,26 +145,5 @@ module Gemini
 
       generate_content({ contents: contents })
     end
-
-    def chat(text, options)
-      history = options[:history]
-      tools = options[:tools]
-      # puts "text: #{text}"
-      # puts "chat history: #{history.get.inspect}"
-
-      # contentsを初期化 (history を考慮)
-      contents = history.get
-
-      # 新しいユーザーメッセージを追加
-      contents += [{ role: 'user', parts: [{ text: text }] }]
-      result = generate_content({ contents: contents }, tools)
-
-      if result[:response]["function_call_result"]
-        result = handle_function_call_result(result, text, history)
-      end
-
-      history.add(result)
-      result
-    end
   end
 end

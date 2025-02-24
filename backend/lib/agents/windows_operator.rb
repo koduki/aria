@@ -8,13 +8,13 @@ module Agent
         def initialize()
             @ps = PowerShell.new
             @history = Gemini::History.new
-            @api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
+            api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
             sysprompt = open(File.join(__dir__, "./prompts/powershell.txt")).read
 
             @client = Gemini::Gemini.new(
             credentials: {
                 service: 'generative-language-api',
-                api_key: @api_key
+                api_key: api_key
             },
             options: { model: 'gemini-2.0-flash-exp', system_instruction:sysprompt, json_mode:true}
             )

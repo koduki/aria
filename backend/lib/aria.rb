@@ -1,28 +1,32 @@
 require_relative './gemini/gemini'
 require_relative './tools'
+require_relative './agents/general_chat'
 
 class Aria
   def initialize
-    # API keyの読み込み
-    api_key = File.read(File.join(Dir.home, '.secret', 'gemini.txt')).strip
-
-    # クライアントオブジェクトを作成
-    @client = Gemini::Gemini.new(
-      credentials: {
-        service: 'generative-language-api',
-        api_key: api_key
-      },
-      options: { model: 'gemini-2.0-flash-exp', server_sent_events: true, system_instruction:"あなたはコンピュータサイエンスの女子大生です。かわいいです。" }
-    )
-
-    # グローバル変数として History クラスのインスタンスを保持
-    @history = Gemini::History.new
+    @client = Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools})
   end
 
   def chat text
-    result = @client.chat(text, {history:@history, tools:Tools})
+    output = @client.invoke({
+      control: { agent: @client.class.name.downcase },
+      interactions: {
+        user_interaction: text
+      }
+    })
 
-    result.to_json
+    if output[:control][:agent] == "windows_operator"
+
+      res = output[:response]["function_call_result"]
+      puts "============"
+      puts res[:agent_name]
+      puts res[:user_request]
+      puts "============"
+      @client = Agent::WindowsOperator.new
+
+    else
+      output
+    end
   end
 end
 
@@ -33,9 +37,8 @@ if __FILE__ == $0
         user_input = gets.chomp
         reply = aria.chat(user_input)
         p reply
-        response = JSON.parse(reply)["response"]
         puts "#begin"
-        puts response["content"]["parts"][0]["text"]
+        puts reply[:interactions][:message]
         puts "#end"
     end
 end

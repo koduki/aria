@@ -21,4 +21,16 @@ module Tools
     return Agent::DeepResearcher.new.invoke(user_request)
   end
 
+  Gemini::FunctionDecorator.doc(:windows_operator,
+    "An agent that operates Windows on behalf of the user using PowerShell based on user instructions.",
+    {
+      user_request: ["string", "required", "The user's Windows operation request."]
+    }
+  )
+  def self.windows_operator(user_request)
+    return {
+      agent_name:"windows_operator",
+      user_request:user_request
+    }
+  end
 end
