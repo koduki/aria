@@ -5,32 +5,33 @@ require_relative './agents/windows_operator'
 
 class Aria
   def initialize
-    @task = nil
     @client = Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools})
+    @agents_meta = {
+      "agent::generalchat" => {
+        interactions: lambda do |text|
+          {
+            user_interaction: text
+          }
+        end,
+        state: {}
+      },
+      "agent::windowsoperator" => {
+        interactions: lambda do |text|
+          {
+            user_interaction: text,
+            task: @agents_meta["agent::windowsoperator"][:state][:task]
+          }
+        end,
+        state: {}
+      }
+    }
   end
 
   def chat text
     p @client.class.name.downcase
-    output = if @client.class.name.downcase == "agent::generalchat"
-               @client.invoke(
-                 {
-                   control: { agent: @client.class.name.downcase },
-                   interactions: {
-                     user_interaction: text
-                   }
-                 }
-               )
-             elsif @client.class.name.downcase == "agent::windowsoperator"
-               @client.invoke(
-                 {
-                   control: { agent: @client.class.name.downcase },
-                   interactions: {
-                     user_interaction: text,
-                     task: @task
-                   }
-                 }
-               )
-             end
+    agent_name = @client.class.name.downcase
+    interactions = @agents_meta[agent_name][:interactions].call(text)
+    output = @client.invoke({interactions: interactions})
 
     chat_response = if output[:control][:agent] == "ROUTER"
                       if output[:interactions][:agent_name] == "agent::windowsoperator"
@@ -38,27 +39,9 @@ class Aria
                         chat(output[:interactions][:user_interaction])
                       end
                     elsif output[:control][:agent] == "agent::windowsoperator"
-                      @task = output[:interactions][:task]
-                      output_text = <<~EOS
-      #{output[:interactions][:exec_result]}
-      -------------
-      thinking: #{output[:interactions][:thinking]}
-      以下のコマンドを実行します。
-      ```
-      #{@task}
-      ```
-
-      ユーザへのリクエスト: #{output[:interactions][:request]}
-                      EOS
-                      {
-                        control: {
-                          agent: "agent::windowsoperator",
-                          status: "RUNNING"
-                        },
-                        interactions: {
-                          message: output_text
-                        }
-                      }
+                      agent_name = output[:control][:agent]
+                      @agents_meta[agent_name][:state][:task] = output[:interactions][:task]
+                      output
                     else
                       output
                     end
@@ -73,7 +56,22 @@ if __FILE__ == $0
     user_input = gets.chomp
     reply = aria.chat(user_input)
     puts "begin"
-    puts reply[:interactions][:message]
+    case reply[:control][:agent]
+    when "agent::windowsoperator"
+      puts <<~EOS
+      #{reply[:interactions][:exec_result]}
+      -------------
+      thinking: #{reply[:interactions][:thinking]}
+      以下のコマンドを実行します。
+      ```
+      #{reply[:interactions][:task]}
+      ```
+
+      ユーザへのリクエスト: #{reply[:interactions][:request]}
+      EOS
+    else
+      puts reply[:interactions][:message]
+    end
     puts "#end"
   end
 end

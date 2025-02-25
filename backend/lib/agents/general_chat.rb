@@ -36,7 +36,6 @@ module Agent
   
       output = if is_agent?(result)
                  agent_info = result[:response]["function_call_result"]
-                 p result[:response]["function_call_result"][:agent_name]
                  {
                    control: {
                      agent: "ROUTER",
@@ -49,8 +48,7 @@ module Agent
                  }
                else
                  if result[:response]["function_call_result"]
-                   result = @client.handle_function_call_result(result, text, 
-                                                                @history)
+                   result = @client.handle_function_call_result(result, text, @history)
                  end
                  @history.add(result)
                  {
