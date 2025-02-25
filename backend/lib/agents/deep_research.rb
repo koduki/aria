@@ -33,8 +33,8 @@ module Agent
         options: { model: 'gemini-2.0-flash-exp', json_mode:true}
       )
       r = client.generate_content({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }]
-      })
+                                    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+                                  })
       JSON.parse(r[:response]["content"]["parts"][0]["text"])
     end
 
@@ -85,8 +85,8 @@ module Agent
           }
         end
         results << {
-            theme: theme_name,
-            contents: item_words
+          theme: theme_name,
+          contents: item_words
         }
       end
 
@@ -104,8 +104,8 @@ def generate_report(contents, prompt)
     options: { model: 'gemini-2.0-flash-exp', system_instruction:prompt}
   )
   r = client.generate_content({
-      contents: [{ role: 'user', parts: [{ text: contents }] }]
-  })
+                                contents: [{ role: 'user', parts: [{ text: contents }] }]
+                              })
   puts "============= Report"
   report = r[:response]["content"]["parts"][0]["text"]
   puts report

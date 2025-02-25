@@ -18,6 +18,7 @@
 ## output:
 
 - agentはエージェント名の判定用
+- statusはREADY|RUNNING|FINISH
 - finishはエージェントの一連の処理が完了したことの確認
 - interactionsの中はエージェント毎に自由
 
@@ -25,7 +26,7 @@
 {
   control: {
     agent: "windows_oerator",
-    finish: false
+    status: "READY"
   },
   interactions: {
     exec_result: "タスクの実行結果",
