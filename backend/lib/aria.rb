@@ -12,20 +12,24 @@ class Aria
   def chat text
     p @client.class.name.downcase
     output = if @client.class.name.downcase == "agent::generalchat"
-               @client.invoke({
-                                control: { agent: @client.class.name.downcase },
-                                interactions: {
-                                  user_interaction: text
-                                }
-                              })
+               @client.invoke(
+                 {
+                   control: { agent: @client.class.name.downcase },
+                   interactions: {
+                     user_interaction: text
+                   }
+                 }
+               )
              elsif @client.class.name.downcase == "agent::windowsoperator"
-               @client.invoke({
-                                control: { agent: @client.class.name.downcase },
-                                interactions: {
-                                  user_interaction: text,
-                                  task: @task
-                                }
-                              })
+               @client.invoke(
+                 {
+                   control: { agent: @client.class.name.downcase },
+                   interactions: {
+                     user_interaction: text,
+                     task: @task
+                   }
+                 }
+               )
              end
 
     chat_response = if output[:control][:agent] == "ROUTER"
