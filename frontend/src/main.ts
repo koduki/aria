@@ -90,8 +90,21 @@ ipcMain.on('call-chat', async (event, message) => {
         'Content-Type': 'application/json'
       }
     });
-
-    const replyText = response.data.response.content.parts[0].text;
+    console.log(response.data);
+    
+    // レスポンスデータからエージェントタイプを取得
+    const agentType = response.data.control.agent;
+    let replyText = '';
+    
+    switch (agentType) {
+      case 'agent::generalchat':
+        replyText = response.data.interactions.message;
+        break;
+      case 'agent::windowsoperator':
+        replyText = response.data.interactions.message || response.data.interactions.thinking || '';
+        break;
+    }
+    
     chatWindow.webContents.send('reply-chat', replyText);
   }
 

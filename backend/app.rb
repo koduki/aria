@@ -8,6 +8,7 @@ post '/api/chat' do
   content_type :json
   request_body = JSON.parse(request.body.read)
   text = request_body['text']
-  
-  settings.aria.chat(text)
+  p text
+  r = settings.aria.chat(text)
+  r.to_json
 end

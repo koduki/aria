@@ -45,6 +45,12 @@ class Aria
                     else
                       output
                     end
+
+    puts chat_response[:control][:status] 
+    if chat_response[:control][:status] == "FINISH"
+      puts "finish agent::windowsoperator"
+      change_agent(Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools}))
+    end
     chat_response
   end
 
@@ -73,12 +79,6 @@ if __FILE__ == $0
 
       ユーザへのリクエスト: #{reply[:interactions][:request]}
       EOS
-
-      puts reply[:control][:status] 
-      if reply[:control][:status] == "FINISH"
-        puts "finish agent::windowsoperator"
-        aria.change_agent(Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools}))
-      end
 
     else
       puts reply[:interactions][:message]
