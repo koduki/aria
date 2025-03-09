@@ -5,7 +5,7 @@ require_relative './agents/windows_operator'
 
 class Aria
   def initialize
-    @client = Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools})
+    @agent = Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools})
     @agents_meta = {
       "agent::generalchat" => {
         interactions: lambda do |text|
@@ -28,14 +28,14 @@ class Aria
   end
 
   def chat text
-    p @client.class.name.downcase
-    agent_name = @client.class.name.downcase
+    p @agent.class.name.downcase
+    agent_name = @agent.class.name.downcase
     interactions = @agents_meta[agent_name][:interactions].call(text)
-    output = @client.invoke({interactions: interactions})
+    output = @agent.invoke({interactions: interactions})
 
     chat_response = if output[:control][:agent] == "ROUTER"
                       if output[:interactions][:agent_name] == "agent::windowsoperator"
-                        @client = Agent::WindowsOperator.new
+                        @agent = Agent::WindowsOperator.new
                         chat(output[:interactions][:user_interaction])
                       end
                     elsif output[:control][:agent] == "agent::windowsoperator"
@@ -46,6 +46,10 @@ class Aria
                       output
                     end
     chat_response
+  end
+
+  def change_agent(new_client)
+    @agent = new_client
   end
 end
 
@@ -69,6 +73,13 @@ if __FILE__ == $0
 
       ユーザへのリクエスト: #{reply[:interactions][:request]}
       EOS
+
+      puts reply[:control][:status] 
+      if reply[:control][:status] == "FINISH"
+        puts "finish agent::windowsoperator"
+        aria.change_agent(Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools}))
+      end
+
     else
       puts reply[:interactions][:message]
     end

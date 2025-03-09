@@ -31,10 +31,11 @@ module Agent
                                     })
 
       response = parse(llm_response[:interactions][:message])
+      p response
       {
         control: {
           agent: self.class.name.downcase,
-          status: "RUNNING"
+          status: response["status"] 
         },
         interactions: {
           exec_result: exec_result,
