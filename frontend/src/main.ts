@@ -91,20 +91,31 @@ ipcMain.on('call-chat', async (event, message) => {
       }
     });
     console.log(response.data);
-    
+
     // レスポンスデータからエージェントタイプを取得
     const agentType = response.data.control.agent;
     let replyText = '';
-    
+
     switch (agentType) {
       case 'agent::generalchat':
         replyText = response.data.interactions.message;
         break;
       case 'agent::windowsoperator':
-        replyText = response.data.interactions.message || response.data.interactions.thinking || '';
+        replyText = `
+${response.data.interactions.exec_result || ''}
+-------------
+thinking: ${response.data.interactions.thinking || ''}
+以下のコマンドを実行します。
+\`\`\`
+${response.data.interactions.task || ''}
+\`\`\`
+
+ユーザへのリクエスト: ${response.data.interactions.request || ''}
+`;
+        console.log(replyText)
         break;
     }
-    
+
     chatWindow.webContents.send('reply-chat', replyText);
   }
 
