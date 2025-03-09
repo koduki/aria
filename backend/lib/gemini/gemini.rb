@@ -17,10 +17,10 @@ module Gemini
 
       # ユーザーの入力を保存
       user_message = if result[:request][:contents][1] and result[:request][:contents][1][:parts][0][:functionCall]
-        { role: 'user', parts: [{ text:result[:request][:contents][0][:parts][0][:text] }] }
-      else
-        { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
-      end
+                       { role: 'user', parts: [{ text:result[:request][:contents][0][:parts][0][:text] }] }
+                     else
+                       { role: 'user', parts: [{ text: result[:request][:contents][-1][:parts][0][:text] }] }
+                     end
       @history.push(user_message)
 
       # モデルの応答を保存
@@ -70,16 +70,16 @@ module Gemini
         }
 
         tool_options = if tool_config.nil?
-          {
-            "tool_config": {
-              "function_calling_config": {
-                "mode": "AUTO"
-              },
-            }
-          }
-        else
-          { "tool_config": tool_config }
-        end
+                         {
+                           "tool_config": {
+                             "function_calling_config": {
+                               "mode": "AUTO"
+                             },
+                           }
+                         }
+                       else
+                         { "tool_config": tool_config }
+                       end
         tools_payload = tools_def.merge(tool_options)
       end
 
@@ -144,27 +144,6 @@ module Gemini
       contents += [function_result]
 
       generate_content({ contents: contents })
-    end
-
-    def chat(text, options)
-      history = options[:history]
-      tools = options[:tools]
-      # puts "text: #{text}"
-      # puts "chat history: #{history.get.inspect}"
-
-      # contentsを初期化 (history を考慮)
-      contents = history.get
-
-      # 新しいユーザーメッセージを追加
-      contents += [{ role: 'user', parts: [{ text: text }] }]
-      result = generate_content({ contents: contents }, tools)
-
-      if result[:response]["function_call_result"]
-        result = handle_function_call_result(result, text, history)
-      end
-
-      history.add(result)
-      result
     end
   end
 end

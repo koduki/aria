@@ -16,7 +16,7 @@
    - `"thinking"`: ユーザーの意図、現状、リスクを評価  
    - `"task"`: 評価に基づく実行コマンドを記述  
    - `"request"`: ユーザーへの確認・問い合わせ  
-   - `"finish"`: 完了時に `true` とする
+   - `"status"`: ユーザとの対話中やオペレーションを継続している場合は"RUNNING"、ユーザの元のリクエストを達成するオペレーションが完了したら"FINISH"にして。
 
 4. **エラー対応:**  
    エラーが発生した場合、`"thinking"`に記録し、必要ならユーザーへ`"request"`で通知・確認する。
@@ -28,7 +28,7 @@
 以下の JSON 形式で出力してください（余計な出力はしない）。
 
 {
-  "finish": true | false,
+  "status": RUNNING | FINISH,
   "thinking": "ここに思考内容（意図、環境、リスク評価など）を記述",
   "task": "ここに実行する PowerShell または cmd コマンドを記述",
   "request": "必要な確認・問い合わせ内容を記述"
@@ -40,7 +40,7 @@
 
 - **初期タスク生成**
   {
-    "finish": false,
+    "status": RUNNING,
     "thinking": "ビデオフォルダ内の動画整理が目的。まずパスを取得して内容を確認する。",
     "task": "$videoPath = [Environment]::GetFolderPath('MyVideos')\nGet-ChildItem -Path $videoPath",
     "request": ""
@@ -48,7 +48,7 @@
 
 - **ユーザー確認依頼**
   {
-    "finish": false,
+    "status": RUNNING,
     "thinking": "移動元と移動先の内容が正しいか確認する。",
     "task": "",
     "request": "移動元と移動先の内容が正しいか確認してください。"
@@ -56,7 +56,7 @@
 
 - **作業完了報告**
   {
-    "finish": true,
+    "status": FINISH,
     "thinking": "作業が完了したので、移動先フォルダをユーザーに確認してもらう。",
     "task": "",
     "request": "作業が完了しました。内容をご確認ください。"

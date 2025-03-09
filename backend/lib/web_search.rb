@@ -14,7 +14,7 @@ class WebSearch
     search_results = WebClient.new.open(url, wait_element: 'ol.react-results--main', headless: true) do |driver|
       results = []
       driver.find_elements(css: 'ol.react-results--main li article').each do |li_element|
-      #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
+        #   puts "li_element innerHTML: #{li_element.attribute('innerHTML')}"
         title_element = li_element.find_element(css: 'h2 a span')
         url_element = li_element.find_element(css: 'h2 a')
         title = title_element.text
@@ -26,5 +26,4 @@ class WebSearch
     end
     search_results
   end
-
 end
