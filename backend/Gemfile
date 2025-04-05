@@ -5,7 +5,7 @@ gem 'json'
 gem 'rackup'
 gem 'puma'
 
-gem 'selenium-webdriver'
+gem 'selenium-webdriver', '~> 4.26.0'
 gem "minitest", "~> 5.25"
 gem 'nkf'
 gem 'rubocop'
