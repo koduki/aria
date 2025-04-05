@@ -46,7 +46,7 @@ class Aria
                       output
                     end
 
-    puts chat_response[:control][:status] 
+    puts chat_response[:control][:status]
     if chat_response[:control][:status] == "FINISH"
       puts "finish agent::windowsoperator"
       change_agent(Agent::GeneralChat.new({history:Gemini::History.new, tools:Tools}))
