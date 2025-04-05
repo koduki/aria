@@ -15,7 +15,7 @@
   "dependencies": {
     "@pixiv/three-vrm": "^1.0.10",
     "@pixiv/three-vrm-animation": "^3.3.6",
-    "axios": "^1.8.4",
+    "axios": "^1.8.2",
     "electron": "^35.1.4",
     "three": "^0.175.0"
   },
